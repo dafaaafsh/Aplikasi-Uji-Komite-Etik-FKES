@@ -91,14 +91,26 @@
                         <td class="px-4 py-3 text-center">{{ $item->judul }}</td>
                         <td class="px-2 py-3 text-center font-semibold">{{ $item->peneliti->name }}</td>
                         <td class="px-2 py-3 text-center
-                            @if ($item->status_pembayaran == 'Diperiksa')
-                                text-yellow-600 font-semibold
-                            @elseif ($item->status_pembayaran == 'Dikembalikan' || $item->status_pembayaran == 'Menunggu Pembayaran')
-                                text-red-600 font-semibold
-                            @elseif ($item->status_pembayaran == 'Diterima')
-                                text-green-600 font-semibold
-                            @endif
-                        ">{{ $item->status_pembayaran }}</td>
+                            @if(!empty($item->tarif)){
+                                @if ($item->status_pembayaran == 'Diperiksa')
+                                    text-yellow-600 font-semibold
+                                @elseif ($item->status_pembayaran == 'Dikembalikan' || $item->status_pembayaran == 'Menunggu Pembayaran')
+                                    text-red-600 font-semibold
+                                @elseif ($item->status_pembayaran == 'Diterima')
+                                    text-green-600 font-semibold
+                                @endif
+                            } @else {
+                                text-gray-500 italic
+                            } @endif
+                        ">
+                        @if ($item->tarif ==null)
+                        <button onclick="modaltarif({{ $item->id }})">
+                            <span class="italic hover:text-gray-700 hover:underline">Belum ditentukan</span>
+                        </button>
+                        @else
+                            {{ $item->status_pembayaran }}
+                        @endif
+                        </td>
                         <td class="px-2 py-3 text-center font-semibold">
                             <button onclick="openBukti({{ $item->id }})"
                             class="text-blue-700 hover:underline">
@@ -130,6 +142,32 @@
             <div>
                 {{ $protokol->links('pagination::tailwind') }}
             </div>
+        </div>
+    </div>
+
+    {{-- modal tarif --}}
+    <div id="modalTarif" class="fixed hidden inset-0 bg-black/70 bg-opacity-50 z-50 justify-center items-center">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">Isi Tarif Protokol</h2>
+                <button onclick="tutupModalTarif()" class="text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+            
+            <form method="POST" action="{{route('admin.tarifProtokol.update')}}">
+                @csrf
+                <input type="hidden" name="id" id="tarif_id">
+
+                <div class="mb-4">
+                    <label for="tarif" class="block text-sm font-medium text-gray-700">Tarif Protokol</label>
+                    <input type="number" name="tarif" id="tarif"
+                        class="mt-1 block w-full px-4 py-1 border border-gray-600 rounded-md shadow-sm focus:ring focus:ring-blue-200" required>
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="tutupModalTarif()" class="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-700">Batal</button>
+                    <button type="submit" class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700">Simpan</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -322,6 +360,18 @@
             document.getElementById('modalBukti').classList.add('hidden');
             document.getElementById('modalBukti').classList.remove('flex');
             currentProtocolId = null;
+        }
+
+        function modaltarif(id) {
+            document.getElementById('tarif_id').value = id;
+
+            document.getElementById('modalTarif').classList.remove('hidden');
+            document.getElementById('modalTarif').classList.add('flex');
+        }
+
+        function tutupModalTarif() {
+            document.getElementById('modalTarif').classList.add('hidden');
+            document.getElementById('modalTarif').classList.remove('flex');
         }
         
         function tolakPembayaran() {

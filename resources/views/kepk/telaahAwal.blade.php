@@ -331,7 +331,7 @@
             <h2 class="text-xl font-bold text-gray-800 mb-4">Konfirmasi Penelitian Exempted</h2>
             <p class="text-gray-700 mb-4">
                 Anda akan melanjutkan penelitian ini dan menetapkannya sebagai <span class="font-semibold text-green-600">kategori Exempted</span>.
-                Silakan isi komentar dan unggah Surat Lolos Etik.
+                Silakan isi komentar dan unggah Lampiran Exempted.
             </p>
 
             <form action="{{ route('kepk.exempted') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
@@ -346,8 +346,8 @@
                 </div>
 
                 <div>
-                    <label for="surat_lolos_etik" class="block text-sm font-medium text-gray-700">Unggah Surat Lolos Etik (PDF)</label>
-                    <input type="file" name="surat_lolos_etik" id="surat_lolos_etik" accept="application/pdf" 
+                    <label for="lampiran" class="block text-sm font-medium text-gray-700">Unggah lampiran exempted</label>
+                    <input type="file" name="lampiran" id="lampiran" accept="application/pdf" 
                         class="mt-1 block w-full text-sm text-gray-700 file:bg-blue-100 file:border-none file:rounded-md file:px-3 file:py-2 file:text-sm file:text-blue-800 hover:file:bg-blue-200" />
                 </div>
 

@@ -3,10 +3,48 @@
 
   <div class="p-6">
 
+    @if ($errors->any())
+        <div id="modalError" class="fixed flex inset-0 bg-black/70 bg-opacity-50 z-50 justify-center items-center">
+            <div class="bg-red-100 border border-red-800 rounded-lg shadow-lg w-full max-w-md p-6 h-fit max-h-md">
+
+                <div class="bg-red-100 text-red-800 px-4 py-2 rounded mb-4">
+                    <strong>Gagal menyimpan!</strong> Periksa kembali input Anda:
+                    <ul class="mt-2 list-disc list-inside text-sm">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>  
+
+                <div class="flex justify-end">
+                    <button type="button" onclick="tutupModalError()" class="px-4 py-2 rounded bg-gray-600 hover:bg-gray-700 text-white font-semibold">Tutup</button>
+                </div>
+
+            </div>
+        </div>
+    @endif
+
+    @if (session('success'))
+        <div id="modalSuccess" class="fixed flex inset-0 bg-black/70 bg-opacity-50 z-50 justify-center items-center">
+            <div class="bg-green-100 border border-green-800 rounded-lg shadow-lg w-full max-w-md p-6 h-fit max-h-md">
+
+                <div class="bg-green-100 text-green-800 px-4 py-2 rounded mb-4">
+                    <strong>Berhasil!</strong>
+                    <p class="text-sm mt-2">{{ session('success') }}</p>
+                </div>  
+
+                <div class="flex justify-end">
+                    <button type="button" onclick="tutupModalSuccess()" class="px-4 py-2 rounded bg-green-700 hover:bg-green-800 text-white font-semibold">Tutup</button>
+                </div>
+
+            </div>
+        </div>
+    @endif
+
     <!-- Filter & Search -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+        <div class=" px-6 py-4 bg-gradient-to-r flex from-gray-900 to-gray-700 text-white justify-between rounded-t-2xl gap-x-10">
       <div class="flex gap-2 items-center">
-        <label class="font-medium text-gray-700">Status:</label>
+        <label class="font-medium">Status:</label>
         <select id="statusFilter" class="border rounded-md px-3 py-1 text-sm">
           <option value="">Semua</option>
           <option value="Diperiksa">Diperiksa</option>
@@ -62,17 +100,24 @@
             </td>
             <td class="px-4 py-2">{{ $protokol->created_at->format('d M Y') }}</td>
             <td class="px-4 py-2 text-center flex gap-1">
-                <button onclick="loadDetailPengajuan({{ $protokol->id }})"
+                <button onclick="loadDetailData({{ $protokol->id }})"
                     class="px-3 py-1 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded">
                     Detail
                 </button>
-                <form action="{{ route('admin.uploadSuratLulus', $protokol->id) }}" method="POST" enctype="multipart/form-data" class="inline">
+                @if ($protokol->putusan->path)
+                  <a href="{{ asset('private/protokol/'.$protokol->nomor_protokol.'/'.$protokol->putusan->path) }}" target="_blank"
+                    class="px-3 py-1 text-sm bg-yellow-600 hover:bg-yellow-700 text-white rounded">
+                    Surat
+                  </a>
+                @else
+                  <form action="{{ route('admin.uploadSuratLulus', $protokol->id) }}" method="POST" enctype="multipart/form-data" class="inline">
                     @csrf
                     <label class="inline-flex items-center cursor-pointer">
                         <input type="file" name="surat_lulus" accept="application/pdf" class="hidden" onchange="this.form.submit()">
                         <span class="px-3 py-1 text-sm bg-green-600 hover:bg-green-700 text-white rounded">Upload</span>
                     </label>
                 </form>
+                @endif
             </td>
           </tr>
           @endforeach
@@ -211,10 +256,13 @@
             </div>
           </div>
         </div>
-    </div>
+
+
+  </div>
+
 
     <script>
-        function loadDetailPengajuan(id) {
+        function loadDetailData(id) {
             fetch(`/admin/pengajuanPenelitian/${id}`)
                 .then(res => res.json())
                 .then(data => {
@@ -289,6 +337,16 @@
             const modal = document.getElementById('modalDetailPengajuan');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+        }
+
+        function tutupModalError() {
+            document.getElementById('modalError').classList.add('hidden');
+            document.getElementById('modalError').classList.remove('flex');
+        }
+
+        function tutupModalSuccess() {
+            const modal = document.getElementById('modalSuccess');
+            if (modal) modal.classList.add('hidden');
         }
     </script>
 </x-Layout>

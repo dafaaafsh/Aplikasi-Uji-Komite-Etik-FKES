@@ -13,6 +13,7 @@ use App\Http\Controllers\PengujiController;
 use App\Http\Controllers\PenelitiController;
 use App\Http\Controllers\KeputusanController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\SuratController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 // Halaman umum
@@ -37,6 +38,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':Peneliti'])->group(function
         Route::get('/peneliti/penelitian/keputusan/{id}', [PenelitiController::class, 'getKeputusan']);
         Route::get('/peneliti/nomorProtokol', [PenelitiController::class, 'nomorProtokol'])->middleware('verified')->name('peneliti.nomorProtokol');
         Route::post('/peneliti/nomorProtokol',[PenelitiController::class, 'storeNomor']);
+        Route::get('/peneliti/protokol/{id}',[PenelitiController::class, 'getDetailProtokol'])->name('peneliti.protokol.detail');
         Route::post('/peneliti/nomorProtokol/upload',[PenelitiController::class, 'uploadBukti'])->name('peneliti.upload.bukti');
         Route::get('/peneliti/pengajuanPenelitian', [PenelitiController::class, 'pengajuan'])->name('peneliti.pengajuan');
         Route::post('/peneliti/pengajuanPenelitian/storeDocument', [PenelitiController::class, 'storeDocument'])->name('pengajuan.store');
@@ -61,6 +63,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':Admin'])->group(function ()
 
     Route::middleware(['verified'])->group(function () {
         Route::get('/admin/nomorProtokol', [AdminController::class,'nomorProtokol'])->name('admin.nomorProtokol');
+        Route::post('/admin/nomorProtokol/tarif', [AdminController::class, 'updateTarif'])->name('admin.tarifProtokol.update');
         Route::get('/admin/nomorProtokol/bukti/{id}', [AdminController::class,'getBukti'])->name('admin.bukti');
         Route::post('/admin/protokol/tolak-bukti/{id}', [AdminController::class, 'tolakBukti']);
         Route::post('/admin/protokol/terima-bukti/{id}', [AdminController::class, 'terimaBukti']);  
@@ -71,10 +74,10 @@ Route::middleware(['auth', RoleMiddleware::class . ':Admin'])->group(function ()
         Route::put('/admin/pengajuanPenelitian/kembalikan', [ AdminController::class, 'kembalikan'])->name('admin.kembalikan');
         Route::put('/admin/pengajuanPenelitian/lanjutkan', [ AdminController::class, 'lanjutkan'])->name('admin.lanjutkan');
         Route::get('/admin/dataPenelitian', [AdminController::class, 'dataPenelitian'])->name('admin.dataPenelitian');
+        Route::get('/admin/detailPenelitian/${id}', [AdminController::class, 'getDataPenelitian'])->name('admin.detailDataPenelitian');
         Route::post('/admin/suratLulus/upload/{id}', [AdminController::class, 'uploadSuratLulus'])->name('admin.uploadSuratLulus');
         Route::get('/admin/suratLulus', [AdminController::class, 'suratLulus'])->name('admin.suratLulus');
         Route::post('/admin/suratLulus/store', [AdminController::class, 'storeSurat'])->name('admin.surat-lulus.store');
-        Route::get('/admin/suratLulus/{id}', [AdminController::class, 'getDetailSurat'])->name('admin.detailSurat');
     });
 
     Route::get('/Admin/profil', [AdminController::class, 'profil'])->name('admin.profil');

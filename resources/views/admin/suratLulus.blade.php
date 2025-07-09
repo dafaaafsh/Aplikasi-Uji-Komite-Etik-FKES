@@ -11,7 +11,7 @@
             <table class="min-w-full text-sm text-left divide-y divide-gray-200">
                 <thead class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider">
                     <tr>
-                        <th class="px-4 py-3">No</th>
+                        <th class="px-4 py-3">No. Protokol</th>
                         <th class="px-4 py-3">Judul Protokol</th>
                         <th class="px-4 py-3">Peneliti</th>
                         <th class="px-4 py-3">Tanggal Diterima</th>
@@ -21,7 +21,7 @@
                 <tbody class="text-gray-800 bg-white divide-y divide-gray-100">
                     @forelse($protokols as $index => $protokol)
                         <tr class="hover:bg-gray-50 transition">
-                            <td class="px-4 py-3">{{ $index + 1 }}</td>
+                            <td class="px-4 py-3">{{ $protokol->nomor_protokol_asli }}</td>
                             <td class="px-4 py-3">{{ $protokol->judul }}</td>
                             <td class="px-4 py-3">{{ $protokol->peneliti->name }}</td>
                             <td class="px-4 py-3">{{ $protokol->putusan->created_at->format('d M Y') }}</td>
@@ -67,7 +67,7 @@
                         <option value="">-- Pilih Protokol --</option>
                         @foreach($protokols as $protokol)
                             <option value="{{ $protokol->id }}" {{ old('protokol_id') == $protokol->id ? 'selected' : '' }}>
-                                {{ $protokol->judul }} - {{ $protokol->peneliti->name }}
+                                {{ $protokol->nomor_protokol_asli }} - {{ $protokol->judul }}
                             </option>
                         @endforeach
                     </select>
@@ -98,22 +98,10 @@
                 </div>
 
                 <div>
-                    <label for="tanggal_pengajuan" class="block text-sm font-medium text-gray-700">Tanggal Pengajuan</label>
-                    <input type="date" name="tanggal_pengajuan" id="tanggal_pengajuan" required value="{{ old('tanggal_pengajuan') }}"
-                        class="w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200" />
-                </div>
-
-                <div>
                     <label for="tanggal_persetujuan" class="block text-sm font-medium text-gray-700">Tanggal Persetujuan</label>
                     <input type="date" name="tanggal_persetujuan" id="tanggal_persetujuan" required value="{{ old('tanggal_persetujuan') }}"
                         class="w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200" />
                 </div>
-            </div>
-
-            <div>
-                <label for="keterangan" class="block text-sm font-medium text-gray-700">Keterangan (opsional)</label>
-                <textarea name="keterangan" id="keterangan" rows="3"
-                    class="w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200">{{ old('keterangan') }}</textarea>
             </div>
 
             <div class="pt-4 flex justify-end">
@@ -124,4 +112,23 @@
             </div>
         </form>
     </section>
+
+    <script>
+    document.getElementById('protokol_id').addEventListener('change', function () {
+        const protokolId = this.value;
+        if (!protokolId) return;
+
+        fetch(`/admin/protokol/${protokolId}/data`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('nama_peneliti').value = data.nama_peneliti || '';
+                document.getElementById('institusi').value = data.institusi || '';
+                document.getElementById('judul_penelitian').value = data.judul_penelitian || '';
+                document.getElementById('nomor_protokol').value = data.nomor_protokol || '';
+                document.getElementById('tanggal_persetujuan').value = data.tanggal_persetujuan || '';
+            })
+            .catch(error => console.error('Gagal mengambil data protokol:', error));
+    });
+    </script>
+
 </x-Layout>

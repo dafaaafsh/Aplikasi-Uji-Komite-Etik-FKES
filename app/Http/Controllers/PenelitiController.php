@@ -110,6 +110,21 @@ class PenelitiController extends Controller
         return redirect()->back()->with('success', 'Data berhasil disimpan!');
     }
 
+    public function getDetailProtokol($id){
+        $protocol = protocols::with(['peneliti'])->findOrFail($id);
+        return response()->json([
+            'id' => $protocol->id,
+            'nomor_protokol' => $protocol->nomor_protokol_asli,
+            'judul' => $protocol->judul,
+            'pembayaran' => $protocol->verified_pembayaran,
+            'status_pembayaran' => $protocol->status_pembayaran,
+            'tarif' => $protocol->tarif,
+            'peneliti_utama' => $protocol->peneliti->name,
+            'tanggal_pengajuan' => $protocol->created_at->toDateString(),
+            'status' => $protocol->status_penelitian,
+        ]);
+    }
+
     public function uploadBukti(Request $request){
         $validated = $request->validate([
             'protocol_id' => 'required',

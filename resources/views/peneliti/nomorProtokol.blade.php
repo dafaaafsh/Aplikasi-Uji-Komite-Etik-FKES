@@ -83,6 +83,7 @@
               <td class="px-6 py-4">{{ $item->subjek_penelitian }}</td>
               <td class="px-6 py-4">{{ $item->jenis_penelitian }}</td>
               <td class="px-6 py-4">{{ $item->jenis_pengajuan }}</td>
+              
               <td class="p-3 text-center">
                 @php
                   $statusColors = [
@@ -100,10 +101,15 @@
               <td class="px-6 py-4 
                 @if ($item->status_pembayaran === 'Diterima') text-green-600  
                 @else text-red-600 
-                @endif ">
+                @endif "
+                >
                 @if ($item->status_pembayaran === 'Diterima') Dibayar
                 @else 
-                  <a onclick="openQr()" class="hover:underline">Perlu dibayar</a>
+                  @if (empty($item->tarif))
+                    <span class="text-gray-500 italic">Belum ditentukan</span>
+                  @else
+                    <a onclick="openQr()" class="hover:underline">Perlu Dibayar</a>
+                  @endif
                 @endif
                 <td class="px-6 py-4">
                   <div class="flex gap-3">
@@ -129,12 +135,6 @@
                     <button 
                       onclick="openDetail({{ $item->id }})"
                       class="px-4 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm flex items-center gap-1"
-                      data-id="{{ $item->id }}"
-                      data-nomor="{{ $item->nomor_protokol_asli }}"
-                      data-judul="{{ $item->judul }}"
-                      data-nama="{{ $item->peneliti->name }}"
-                      data-pembayaran="{{ $item->verified_pembayaran }}"
-                      title="Lihat Detail Protokol"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" 
                            fill="none" viewBox="0 0 24 24" 
@@ -160,7 +160,6 @@
       </table>
     </div>
   </div>
-  
 
   {{-- Form Daftar Nomor Protokol --}}
   <div class=" mx-auto bg-white p-8 mt-8 rounded-2xl shadow-lg">
@@ -296,7 +295,6 @@
       </form>
     </div>
   </div>
-  
 
 {{-- Modal Detail --}}
 <div id="detailModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-200">
@@ -311,7 +309,7 @@
       <p class="text-sm text-gray-700 mb-1"><strong>Nama Peneliti:</strong> <span id="nama-peneliti"></span></p>
       <p class="text-sm text-gray-700 mb-1"><strong>Status Pembayaran:</strong> <span id="status-pembayaran"></span></p>
       <p class="text-sm text-gray-700 mb-1"><strong>Tanggal Pembayaran:</strong> <span id="tanggal-pembayaran"></span></p>
-      <p class="text-sm text-gray-700 mb-1"><strong>Jumlah Pembayaran:</strong> <span>Rp. 500.000,-</span></p>
+      <p class="text-sm text-gray-700 mb-1"><strong>Jumlah Pembayaran:</strong> <span id="tarif"></span></p>
     </div>
 
       <div class="flex justify-between mt-6">
@@ -328,16 +326,24 @@
   </div>
 </div>
 
-<!-- Modal QR Code Pembayaran -->
+<!-- Modal Pembayaran -->
 <div id="modalQRCode" class="fixed inset-0 z-50 hidden backdrop-blur-sm bg-black/40 items-center justify-center transition-opacity duration-300">
   <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl text-center">
-    <h2 class="text-xl font-bold text-gray-800 mb-3">Scan untuk Membayar</h2>
-    <p class="text-sm text-gray-600 mb-4">Gunakan aplikasi e-wallet Anda untuk scan QR berikut:</p>
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://example.com/bayar"
-         alt="QR Code Pembayaran"
-         class="mx-auto mb-4 rounded shadow-md">
+    <h2 class="text-xl font-bold text-gray-800 mb-3">Informasi Pembayaran</h2>
+    <p class="text-sm text-gray-600 mb-4">Silakan transfer ke rekening berikut:</p>
 
-    <p class="text-sm text-gray-500 mb-4">Setelah pembayaran berhasil, Silahkan upload bukti pembayaran pada tombol upload.</p>
+    <div class="bg-gray-100 border border-gray-300 rounded-lg p-4 text-left mb-4">
+      <p class="text-sm text-gray-700 font-medium">Bank:</p>
+      <p class="text-lg font-bold text-gray-900 mb-2">BNI</p>
+
+      <p class="text-sm text-gray-700 font-medium">Nomor Rekening:</p>
+      <p class="text-lg font-bold text-blue-700 tracking-wide">790071059</p>
+
+      <p class="text-sm text-gray-700 font-medium mt-3">Atas Nama:</p>
+      <p class="text-lg font-semibold text-gray-900">Fakultas Kesehatan Universitas Nurul Jadid</p>
+    </div>
+
+    <p class="text-sm text-gray-500 mb-4">Setelah pembayaran berhasil, silakan upload bukti pembayaran melalui tombol upload yang tersedia.</p>
 
     <button onclick="closeQr()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm">
       Kembali
@@ -363,7 +369,6 @@
   </div>
 </div>
 
-
   <script>
 
       function openUploadBukti(id) {
@@ -377,34 +382,43 @@
       }
 
       function openDetail(id) {
-        // Ambil data dari baris yang sesuai dengan tombol yang diklik
-        const button = document.querySelector(`button[data-id="${id}"]`);
-        const no = button.getAttribute('data-nomor') || '-';
-        const judul = button.getAttribute('data-judul') || 'Tidak ada data';
-        const nama = button.getAttribute('data-nama') || 'Tidak ada data';
-        const pembayaran = button.getAttribute('data-pembayaran');
+        fetch(`/peneliti/protokol/${id}`)  
+          .then(response => {
+            if (!response.ok) throw new Error('Gagal mengambil data');
+            return response.json();
+          })
+          .then(data => {
+            document.getElementById('nomor-protokol').textContent = data.nomor_protokol_asli || '-';
+            document.getElementById('judul-penelitian').textContent = data.judul || 'Tidak ada data';
+            document.getElementById('nama-peneliti').textContent = data.nama || 'Tidak ada data';
+            document.getElementById('status-pembayaran').textContent = data.status_pembayaran || 'Tidak ada data';
+            document.getElementById('tanggal-pembayaran').textContent = data.pembayaran ?? '-';
+            if (data.tarif === null || data.tarif === 0) {
+              data.tarif = 'Belum ditentukan';
+            }
+            else {
+              data.tarif = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.tarif);
+              document.getElementById('tarif').textContent = data.tarif;
+            }
 
-        // Isi konten modal
-        document.getElementById('nomor-protokol').textContent = no;
-        document.getElementById('judul-penelitian').textContent = judul;
-        document.getElementById('nama-peneliti').textContent = nama;
-        document.getElementById('status-pembayaran').textContent = pembayaran ? 'Dibayar' : 'Belum dibayar';
-        document.getElementById('tanggal-pembayaran').textContent = pembayaran ? pembayaran : '-' ;
-
-        // Tampilkan modal
-        document.getElementById('detailModal').classList.remove('hidden');
-        document.getElementById('detailModal').classList.add('flex');
-        
-        const bayarButton = document.getElementById('bayarButton');
-
-        if (!pembayaran) {
-          bayarButton.classList.remove('hidden');
-          bayarButton.classList.add('block');
-        } else {
-          bayarButton.classList.remove('block');
-          bayarButton.classList.add('hidden');
-        }
-
+            const bayarButton = document.getElementById('bayarButton');
+            if (!data.verified_pembayaran) {
+              bayarButton.classList.remove('hidden');
+              bayarButton.classList.add('block');
+            } else {
+              bayarButton.classList.remove('block');
+              bayarButton.classList.add('hidden');
+            }
+          
+            // Tampilkan modal
+            const modal = document.getElementById('detailModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          })
+          .catch(error => {
+            console.error('Terjadi kesalahan:', error);
+            alert('Gagal memuat detail. Coba lagi nanti.');
+          });
       }
 
       function closeDetail() {

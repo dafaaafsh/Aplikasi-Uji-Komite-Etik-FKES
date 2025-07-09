@@ -262,7 +262,7 @@ class KepkController extends Controller{
     public function exempted(Request $request){
         $validated = $request->validate([
             'komentar' => 'nullable|string',
-            'surat_lolos_etik' => 'required|mimes:pdf|max:2048', 
+            'lampiran' => 'required|mimes:pdf|max:2048', 
             'protokol_id' => 'required|exists:protocols,id', 
         ]);
 
@@ -273,19 +273,17 @@ class KepkController extends Controller{
         $keputusan->jenis_penerimaan = 'Tanpa Revisi';
 
         $protokol = Protocols::findOrFail($validated['protokol_id']);
-        $file = $validated['surat_lolos_etik'];
+        $file = $validated['lampiran'];
         $nomorProtokol = $protokol->nomor_protokol;
-        $path = 'protokol/'.$nomorProtokol;
+        $path = 'lampiran/'.$nomorProtokol;
+        $filename = 'lampiran_keputusan_'.time().'.'.$file->getClientOriginalExtension();
 
-        Storage::disk('local')->putFileAs($path, $file , 'surat_lulus_etik_'.time().'.'.$file->getClientOriginalExtension());
+        Storage::disk('local')->putFileAs($path, $file , $filename);
 
-        $keputusan->path = 'surat_lulus_etik_'.time().'.'.$file->getClientOriginalExtension();
+        $keputusan->lampiran = $filename;
 
         $protokol->kategori_review = 'Exempted';
-        $protokol->status_penelitian = 'Selesai';
         $protokol->status_telaah = 'Selesai';
-
-
 
         $protokol->save();
         $keputusan->save();

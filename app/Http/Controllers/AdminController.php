@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\protocols;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -346,14 +347,31 @@ class AdminController extends Controller
             'sertifikat_gcp' => $getFile('sertifikat_gcp'),
             'cv' => $getFile('cv'),
 
-            'hasil_akhir' => $protocol->putusan->hasil_akhir ?? '-',
-            'tanggal_keputusan' => $protocol->putusan->created_at->format('d-M-Y') ?? '-',
-            'penerimaan' => $protocol->putusan->jenis_penerimaan ?? '-',
-            'komentar' => $protocol->putusan->komentar ?? '-',
+            'hasil_akhir' => optional($protocol->putusan)->hasil_akhir ?? '-',
+            'tanggal_keputusan' => optional($protocol->putusan)?->created_at?->format('d-M-Y') ?? '-',
+            'penerimaan' => optional($protocol->putusan)->jenis_penerimaan ?? '-',
+            'komentar' => optional($protocol->putusan)->komentar ?? '-',
+            'lampiran_keputusan' => optional($protocol->putusan)->lampiran 
+                ? asset('private/lampiran/'.$protocol->nomor_protokol."/". $protocol->putusan->lampiran)
+                : null,
+                    ]);
+    }
 
-            'lampiran_keputusan' => $protocol->putusan->lampiran ? asset('private/lampiran/'.$protocol->nomor_protokol."/". $protocol->putusan->lampiran) : null,
-
+    public function updateTarif(Request $request){
+        $validated = $request->validate([
+            'id' => 'required|exists:protocols,id',
+            'tarif' => 'required|numeric|min:0',
+        ], [
+            'tarif.required' => 'Tarif belum diisi',
+            'tarif.numeric' => 'Tarif harus berupa angka',
+            'tarif.min' => 'Tarif tidak boleh kurang dari 0',
         ]);
+
+        $protokol = protocols::findOrFail($validated['id']);
+        $protokol->tarif = $validated['tarif'];
+        $protokol->save();
+
+        return redirect()->back()->with('success', 'Tarif berhasil diperbarui');
     }
 
     public function kembalikan(Request $request){
@@ -420,6 +438,27 @@ class AdminController extends Controller
         ]);
     }    
 
+    public function storeSurat(Request $request)
+    {
+        $data = $request->validate([
+            'nomor_surat' => 'required|string',
+            'protokol_id' => 'required|exists:protocols,id',
+            'nama_peneliti' => 'required|string',
+            'institusi' => 'required|string',
+            'judul_penelitian' => 'required|string',
+            'nomor_protokol' => 'required|string',
+            'tanggal_persetujuan' => 'required|date',
+        ]);
+
+        $data['tanggal'] = Carbon::parse($data['tanggal_persetujuan'])->translatedFormat('d F Y');
+
+        $pdf = Pdf::loadView('template.suratLulus', $data);
+
+        $safeNomor = str_replace(['/', '\\'], '-', $data['nomor_surat']);
+
+        return $pdf->download('Surat-Layak-Etik-' . $safeNomor . '.pdf');
+    }
+
     public function uploadSuratLulus(Request $request, $id){
         $request->validate([
             'surat_lulus' => 'required|file|mimes:pdf|max:2048',
@@ -429,20 +468,23 @@ class AdminController extends Controller
 
         $protocol = protocols::findOrFail($id);
 
-        // Cek apakah sudah ada surat lulus
-        if ($protocol->surat_lulus_path) {
-            return redirect()->back()->with('error', 'Surat lulus sudah ada. Hapus terlebih dahulu jika ingin mengganti.');
-        }
-
         // Simpan file surat lulus
         $file = $request->file('surat_lulus');
-        $path = Storage::putFileAs('surat_lulus', $file, "surat_lulus_{$protocol->nomor_protokol_asli}_" . time() . '.pdf');
+        $filename = "surat_lulus_". $protocol->nomor_protokol .'_'. time() . '.pdf';
+        Storage::disk('local')->putFileAs('protokol/'.$protocol->nomor_protokol, $file, $filename);
+
 
         // Update path surat lulus di database
-        $protocol->surat_lulus_path = $path;
+        $protocol->putusan->path = $filename;
+        $protocol->status_penelitian = 'Selesai';
         $protocol->save();
+
+        // Simpan path surat lulus di database
+        $protocol->putusan->save();
 
         return redirect()->back()->with('success', 'Surat lulus berhasil diunggah.');
         
     }
+
+    
 }

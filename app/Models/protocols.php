@@ -28,7 +28,8 @@ class protocols extends Model
         'status_pembayaran',
         'kategori_review',
         'status_telaah',
-        'komentar'
+        'komentar',
+        'tarif',
     ];
 
     public function peneliti(): BelongsTo{

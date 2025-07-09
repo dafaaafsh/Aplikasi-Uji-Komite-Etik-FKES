@@ -22,6 +22,7 @@ return new class extends Migration
             $table->enum('status_penelitian',['Diperiksa','Ditelaah','Dikembalikan','Selesai'])->default('diperiksa');
             $table->string('nomor_protokol')->nullable();
             $table->string('nomor_protokol_asli')->nullable();
+            $table->string('tarif')->nullable();
             $table->timestamp('verified_pembayaran')->nullable();
             $table->string('path_pembayaran')->nullable();
             $table->enum('status_pembayaran',['Menunggu Pembayaran','Diperiksa', 'Diterima', 'Dikembalikan'])->default('Menunggu Pembayaran');
