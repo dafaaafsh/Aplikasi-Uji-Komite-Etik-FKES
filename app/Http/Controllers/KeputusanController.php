@@ -29,18 +29,14 @@ class KeputusanController extends Controller
         if ($validated['hasil_akhir'] === 'Diterima') {
             $file = $validated['file_keputusan'];
             $nomorProtokol = $protokol->nomor_protokol;
-            $path = 'protokol/'.$nomorProtokol;
+            $path = 'lampiran/'.$nomorProtokol;
             $keputusan->jenis_penerimaan = $validated['jenis_penerimaan'];
-
-            if ($request->hasFile('file_keputusan')) {
-
-                Storage::disk('local')->putFileAs($path, $file , 'surat_lulus_etik_'.time().'.'.$file->getClientOriginalExtension());
-
-                $keputusan->path = 'surat_lulus_etik_'.time().'.'.$file->getClientOriginalExtension();
-            }
+            $filename = 'lampiran_keputusan_'.time().'.'.$file->getClientOriginalExtension();
+            
+            Storage::disk('local')->putFileAs($path, $file , $filename);
+            $keputusan->lampiran = $filename;            
         }
 
-        $protokol->status_penelitian = 'Selesai';
         $protokol->status_telaah = 'Selesai';
 
         $protokol->save();

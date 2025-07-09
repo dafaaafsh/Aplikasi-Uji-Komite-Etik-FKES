@@ -21,9 +21,7 @@
                     class="px-3 py-2 border xl:w-247 border-gray-400 rounded focus:ring focus:ring-blue-900 focus:outline-none"
                     placeholder="Ketik kata kunci...">
             </div>
-
             
-        
             <div>
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Cari</button>
             </div>
@@ -224,7 +222,7 @@
     @endif
 
     <div id="modalDetailPengajuan" class="fixed inset-0 z-50 hidden flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto">
-        <div class="flex items-start justify-center min-h-screen px-4 py-8">
+        <div class="flex items-start justify-center min-h-screen w-screen px-4 py-8">
           <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl p-8 relative border border-gray-300">
 
             <button onclick="closeModalDetail()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>

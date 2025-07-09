@@ -288,7 +288,7 @@
                     </div>
     
                     <div>
-                        <label for="file_keputusan" class="block text-sm font-medium text-gray-700">Unggah Surat Keputusan (PDF)</label>
+                        <label for="file_keputusan" class="block text-sm font-medium text-gray-700">Unggah Lampiran Keputusan (PDF)</label>
                         <input type="file" name="file_keputusan" id="file_keputusan" accept="application/pdf"
                             class="mt-1 block w-full text-sm text-gray-700 file:bg-blue-100 file:border-none file:rounded-md file:px-3 file:py-2 file:text-sm file:text-blue-800 hover:file:bg-blue-200" />
                     </div>
@@ -413,6 +413,9 @@
                 <p class="text-sm text-gray-600 mb-1 font-semibold">Catatan Reviewer:</p>
                 <div class="bg-white ${colorCatatan.text} border border-gray-500 rounded-md p-4 text-sm leading-relaxed whitespace-pre-line">${review.catatan}
                 </div>
+              </div>
+              <div class="mt-2">
+                <a href="${review.link}" target="_blank" class="text-blue-600 hover:underline text-sm">Lihat Lampiran</a>
               </div>
             `;
           

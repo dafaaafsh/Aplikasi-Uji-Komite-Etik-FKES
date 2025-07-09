@@ -252,6 +252,7 @@ class KepkController extends Controller{
                     'tanggal' => \Carbon\Carbon::parse($review->created_at)->translatedFormat('l, d F Y H:i'),
                     'hasil' => $review->hasil,
                     'catatan' => $review->catatan ?? 'Tidak ada catatan',
+                    'link' => $review->lampiran ? asset('private/lampiran/'.$review->protokol->nomor_protokol."/". $review->lampiran) : null,
                 ];
             });
     

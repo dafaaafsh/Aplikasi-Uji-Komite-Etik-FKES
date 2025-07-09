@@ -16,6 +16,7 @@ class Review extends Model
         'protokol_id',
         'hasil',
         'catatan',
+        'lampiran',
     ];
 
     public function reviewer()

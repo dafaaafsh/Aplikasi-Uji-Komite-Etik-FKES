@@ -18,6 +18,7 @@ return new class extends Migration
             $table->enum('hasil_akhir',['Diterima','Ditolak'])->nullable();
             $table->text('komentar')->nullable();
             $table->enum('jenis_penerimaan',['Tanpa Revisi','Revisi Mayor', 'Revisi Minor'])->nullable();
+            $table->string('lampiran')->nullable();
             $table->string('path')->nullable();
 
             $table->timestamps();

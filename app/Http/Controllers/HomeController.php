@@ -32,7 +32,7 @@ class HomeController extends Controller
     public function tentang()
     {
         return view('/tentangKami', [
-            'title' => 'Penelitian Saya',
+            'title' => 'Tentang Kami',
         ]);
     }
 

@@ -114,6 +114,10 @@
           <li><x-Nav-Link href="../admin/nomorProtokol" :active="request()->is('admin/nomorProtokol')">Nomor Protokol</x-Nav-Link></li>
           <li><x-Nav-Link href="../admin/pengajuanPenelitian" :active="request()->is('admin/pengajuanPenelitian')">Data Pengajuan</x-Nav-Link></li>
         </div>
+        <div class="max-md:divide-y py-1 divide-gray-600">
+          <li><x-Nav-Link href="../admin/dataPenelitian" :active="request()->is('admin/dataPenelitian')">Data Penelitian</x-Nav-Link></li>
+          <li><x-Nav-Link href="../admin/suratLulus" :active="request()->is('admin/suratLulus')">Buat Surat Lulus</x-Nav-Link></li>
+        </div>
       </ul>
     </div>
 

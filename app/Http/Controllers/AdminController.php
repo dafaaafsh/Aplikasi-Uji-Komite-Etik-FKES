@@ -345,6 +345,14 @@ class AdminController extends Controller
             'proposal_penelitian' => $getFile('proposal_penelitian'),
             'sertifikat_gcp' => $getFile('sertifikat_gcp'),
             'cv' => $getFile('cv'),
+
+            'hasil_akhir' => $protocol->putusan->hasil_akhir ?? '-',
+            'tanggal_keputusan' => $protocol->putusan->created_at->format('d-M-Y') ?? '-',
+            'penerimaan' => $protocol->putusan->jenis_penerimaan ?? '-',
+            'komentar' => $protocol->putusan->komentar ?? '-',
+
+            'lampiran_keputusan' => $protocol->putusan->lampiran ? asset('private/lampiran/'.$protocol->nomor_protokol."/". $protocol->putusan->lampiran) : null,
+
         ]);
     }
 
@@ -377,7 +385,64 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Penelitian berhasil dilanjutkan ke Sekretaris/KEPK');
     }
 
+    public function dataPenelitian(Request $request){
+        $query = protocols::latest()
+                ->where('status_telaah', 'Selesai');
 
-    
+        if ($request->filled('search')) {   
+            $query->where(function ($q) use ($request) {
+                $q->where('judul', 'like', '%' . $request->search . '%')
+                  ->orWhere('nomor_protokol', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('peneliti', function ($sub) use ($request) {
+                      $sub->where('name', 'like', '%' . $request->search . '%');
+                  });
+            });
+        }
 
+        $protocols = $query->paginate(15)->withQueryString();
+
+        return view('admin.dataPenelitian', [
+            'title' => 'Data Penelitian',
+            'protocols' => $protocols
+        ]);
+    }
+
+    public function suratLulus(){
+        $protocols = protocols::whereNotNull('tanggal_pengajuan')
+            ->whereNotNull('nomor_protokol')
+            ->where('status_telaah', 'Selesai')
+            ->latest()
+            ->paginate(15);
+
+        return view('admin.suratLulus', [
+            'title' => 'Buat Surat Lulus',
+            'protokols' => $protocols
+        ]);
+    }    
+
+    public function uploadSuratLulus(Request $request, $id){
+        $request->validate([
+            'surat_lulus' => 'required|file|mimes:pdf|max:2048',
+        ], [
+            'surat_lulus.required' => 'Surat lulus belum dipilih.'
+        ]);
+
+        $protocol = protocols::findOrFail($id);
+
+        // Cek apakah sudah ada surat lulus
+        if ($protocol->surat_lulus_path) {
+            return redirect()->back()->with('error', 'Surat lulus sudah ada. Hapus terlebih dahulu jika ingin mengganti.');
+        }
+
+        // Simpan file surat lulus
+        $file = $request->file('surat_lulus');
+        $path = Storage::putFileAs('surat_lulus', $file, "surat_lulus_{$protocol->nomor_protokol_asli}_" . time() . '.pdf');
+
+        // Update path surat lulus di database
+        $protocol->surat_lulus_path = $path;
+        $protocol->save();
+
+        return redirect()->back()->with('success', 'Surat lulus berhasil diunggah.');
+        
+    }
 }

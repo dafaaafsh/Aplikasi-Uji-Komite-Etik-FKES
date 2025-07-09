@@ -15,6 +15,7 @@ class keputusan extends Model
         'hasil_akhir',
         'komentar',
         'jenis_penerimaan',
+        'lampiran',
         'path',
         
     ];

@@ -70,6 +70,11 @@ Route::middleware(['auth', RoleMiddleware::class . ':Admin'])->group(function ()
         Route::get('/admin/pengajuanPenelitian/{id}', [AdminController::class, 'getDetailPengajuan'])->name('admin.detailPengajuan');
         Route::put('/admin/pengajuanPenelitian/kembalikan', [ AdminController::class, 'kembalikan'])->name('admin.kembalikan');
         Route::put('/admin/pengajuanPenelitian/lanjutkan', [ AdminController::class, 'lanjutkan'])->name('admin.lanjutkan');
+        Route::get('/admin/dataPenelitian', [AdminController::class, 'dataPenelitian'])->name('admin.dataPenelitian');
+        Route::post('/admin/suratLulus/upload/{id}', [AdminController::class, 'uploadSuratLulus'])->name('admin.uploadSuratLulus');
+        Route::get('/admin/suratLulus', [AdminController::class, 'suratLulus'])->name('admin.suratLulus');
+        Route::post('/admin/suratLulus/store', [AdminController::class, 'storeSurat'])->name('admin.surat-lulus.store');
+        Route::get('/admin/suratLulus/{id}', [AdminController::class, 'getDetailSurat'])->name('admin.detailSurat');
     });
 
     Route::get('/Admin/profil', [AdminController::class, 'profil'])->name('admin.profil');
@@ -126,6 +131,16 @@ Route::middleware(['auth'])->group(function () {
 // akses file
 Route::get('/private/protokol/{nomor_protokol}/{filename}', function ($nomor_protokol,$filename){
     $path = storage_path('app/private/protokol/'.$nomor_protokol.'/'.$filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+});
+
+Route::get('/private/lampiran/{nomor_protokol}/{filename}', function ($nomor_protokol,$filename){
+    $path = storage_path('app/private/lampiran/'.$nomor_protokol.'/'.$filename);
 
     if (!file_exists($path)) {
         abort(404);

@@ -105,7 +105,7 @@ class PenelitiController extends Controller
         ];
 
         // Simpan ke database
-        $protokol = protocols::create($dataNomor);
+        protocols::create($dataNomor);
 
         return redirect()->back()->with('success', 'Data berhasil disimpan!');
     }

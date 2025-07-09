@@ -265,7 +265,7 @@
                     </div>
                   </div>
                   <h4 class="text-xl font-semibold text-gray-800 mb-2">Telepon</h4>
-                  <p class="text-gray-600 text-lg">+62 8## #### ####</p>
+                  <p class="text-gray-600 text-lg">+62 822-3020-5116 (admin)</p>
                 </div>
           
                 <!-- Email -->
@@ -282,7 +282,7 @@
                     </div>
                   </div>
                   <h4 class="text-xl font-semibold text-gray-800 mb-2">Email</h4>
-                  <p class="text-gray-600 text-lg">email@saya.com</p>
+                  <p class="text-gray-600 text-lg">kepk@unuja.ac.id</p>
                 </div>
           
                 <!-- Alamat -->

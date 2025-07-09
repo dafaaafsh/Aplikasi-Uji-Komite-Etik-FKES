@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('protokol_id');
             $table->enum('hasil', ['Diterima, Tanpa revisi', 'Diterima, Revisi mayor', 'Diterima, Revisi minor', 'Tidak dapat ditelaah']);
             $table->text('catatan')->nullable();
+            $table->string('lampiran')->nullable(); 
 
             $table->timestamps();
 

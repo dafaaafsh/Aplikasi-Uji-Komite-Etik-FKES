@@ -133,7 +133,7 @@
     </div>
 
     <div id="modalDetailPengajuan" class="fixed inset-0 z-50 hidden flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto">
-        <div class="flex items-start justify-center min-h-screen px-4 py-8">
+        <div class="flex items-start justify-center w-screen min-h-screen px-4 py-8">
           <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl p-8 relative border border-gray-300">
 
             <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
@@ -245,7 +245,7 @@
                   ✕
               </button>
               <h2 class="text-lg font-bold text-gray-800 mb-4">Beri Review Protokol</h2>
-              <form method="POST" id="formReview">
+              <form method="POST" id="formReview" enctype="multipart/form-data" action="">
                 @csrf
                   <input type="hidden" name="protokol_id" id="inputProtokolId">
               
@@ -264,6 +264,20 @@
                       <label for="catatan" class="block font-medium text-gray-700 mb-1">Catatan</label>
                       <textarea name="catatan" id="catatan" rows="4" class="w-full rounded border-gray-300" placeholder="Tulis catatan anda di sini..."></textarea>
                   </div>
+
+                    <div class="mb-6">
+                        <label for="lampiran" class="block text-sm font-semibold text-gray-700 mb-2">Lampiran File Review</label>
+
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg px-4 py-6 text-center hover:border-blue-400 transition">
+                            <input type="file" name="lampiran" id="lampiran"
+                                accept=".pdf,.doc,.docx,.txt"
+                                class="w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
+                                       file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700
+                                       hover:file:bg-blue-100 cursor-pointer"
+                            />
+                            <p class="mt-2 text-xs text-gray-500">Format yang didukung: <span class="font-medium text-gray-700">PDF, DOC, DOCX, TXT</span>. Maksimal ukuran: <span class="font-medium">5MB</span>.</p>
+                        </div>
+                    </div>
                 
                   <div class="flex justify-end">
                       <button type="submit"
