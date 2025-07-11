@@ -184,6 +184,7 @@
         </div>
     </div>
 
+    {{-- Modal Status --}}
     @if ($errors->any())
         <div id="modalError" class="fixed flex inset-0 bg-black/70 bg-opacity-50 z-50 justify-center items-center">
             <div class="bg-red-100 border border-red-800 rounded-lg shadow-lg w-full max-w-md p-6 h-fit max-h-md">
@@ -221,6 +222,7 @@
         </div>
     @endif
 
+    {{-- Modal Detail --}}
     <div id="modalDetailPengajuan" class="fixed inset-0 z-50 hidden flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto">
         <div class="flex items-start justify-center min-h-screen w-screen px-4 py-8">
           <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl p-8 relative border border-gray-300">
@@ -326,6 +328,7 @@
         </div>
     </div>
 
+    {{-- Modal exempted --}}
     <div id="modalExempted" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 bg-opacity-50 hidden">
         <div class="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
             <h2 class="text-xl font-bold text-gray-800 mb-4">Konfirmasi Penelitian Exempted</h2>
@@ -363,6 +366,7 @@
         </div>
     </div>
 
+    {{-- Modal Lanjutkan --}}
     <div id="modalLanjutkan" class="fixed hidden inset-0 bg-black/70 z-50 justify-center items-center">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Lanjutkan</h3>
@@ -397,6 +401,7 @@
         </div>
     </div>
 
+    {{-- Modal Review --}}
     <div id="modalReview" class="fixed py-15 inset-0 z-50 hidden bg-black/60 backdrop-blur-sm overflow-y-auto flex items-center justify-center">
         <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl p-8 relative border border-gray-300 mx-4 my-auto">
             <button onclick="closeModalReview()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-2xl font-bold">&times;</button>
@@ -496,75 +501,82 @@
             });
         }
 
-        function openModalReviewList(reviews) {
-          const container = document.getElementById('review_list');
-          container.innerHTML = '';
-
-          if (reviews.length === 0) {
-            container.innerHTML = `
-              <div class="text-center text-gray-500 italic">Tidak ada review tersedia.</div>
-            `;
-            return;
-          }
-      
-          reviews.forEach((review, i) => {
-            const color = getBadgeColor(review.hasil);
-            const colorCatatan = getColorCatatan(review.catatan);
-        
-            const item = document.createElement('div');
-            item.className = 'bg-gray-100 hover:shadow-xl transition-all ease-in-out duration-700 ease-in-out shadow-md border border-gray-500 rounded-xl p-6 space-y-4';
-        
-            item.innerHTML = `
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-800">${review.nama}</h3>
-                  <p class="text-sm text-gray-500">Ditinjau pada ${review.tanggal}</p>
-                </div>
-                <span class="inline-block text-sm px-3 py-1 rounded-full font-medium ${color.bg} ${color.text}">
-                  ${review.hasil}
-                </span>
-              </div>
-          
-              <div>
-                <p class="text-sm text-gray-600 mb-1 font-semibold">Catatan Reviewer:</p>
-                <div class="bg-white ${colorCatatan.text} border border-gray-500 rounded-md p-4 text-sm leading-relaxed whitespace-pre-line">${review.catatan}
-                </div>
-              </div>
-            `;
-          
-            container.appendChild(item);
-          });
-      
-          document.getElementById('modalReview').classList.remove('hidden');
-        }
-
         function getBadgeColor(hasil) {
-          const result = hasil.toLowerCase();
-          if (result.includes("diterima")) {
-            return { bg: 'bg-green-100', text: 'text-green-700' };
-          } else {
-            return { bg: 'bg-red-100', text: 'text-red-700' };
-          }
+              const result = hasil.toLowerCase();
+              if (result.includes("diterima")) {
+                return { bg: 'bg-green-100', text: 'text-green-700' };
+              } else {
+                return { bg: 'bg-red-100', text: 'text-red-700' };
+              }
+            }
+
+            function getColorCatatan(catatan){
+                const result = catatan.toLowerCase();
+              if (result.includes("tidak ada catatan")) {
+                return { text: 'text-gray-400 italic' };
+              } else {
+                return { text: 'text-gray-800' };
+              }
         }
 
-        function getColorCatatan(catatan){
-            const result = catatan.toLowerCase();
-          if (result.includes("tidak ada catatan")) {
-            return { text: 'text-gray-400 italic' };
-          } else {
-            return { text: 'text-gray-800' };
-          }
+        function openModalReviewList(reviews) {
+              const container = document.getElementById('review_list');
+              document.getElementById('modalReview').classList.remove('hidden');
+              container.innerHTML = '';
+
+              if (reviews.length === 0) {
+                container.innerHTML = `
+                  <div class="text-center text-gray-500 italic">
+                    <svg class="mx-auto mb-2 w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-4h6v4m-3 4a9 9 0 100-18 9 9 0 000 18z" />
+                    </svg>
+                    Tidak ada review tersedia.
+                  </div>
+                `;
+                return;
+              }
+          
+              reviews.forEach((review, i) => {
+                const color = getBadgeColor(review.hasil);
+                const colorCatatan = getColorCatatan(review.catatan);
+            
+                const item = document.createElement('div');
+                item.className = 'bg-gray-100 hover:shadow-xl transition-all ease-in-out duration-700 ease-in-out shadow-md border border-gray-500 rounded-xl p-6 space-y-4';
+            
+                item.innerHTML = `
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <h3 class="text-lg font-semibold text-gray-800">${review.nama}</h3>
+                      <p class="text-sm text-gray-500">Ditinjau pada ${review.tanggal}</p>
+                    </div>
+                    <span class="inline-block text-sm px-3 py-1 rounded-full font-medium ${color.bg} ${color.text}">
+                      ${review.hasil}
+                    </span>
+                  </div>
+              
+                  <div>
+                    <p class="text-sm text-gray-600 mb-1 font-semibold">Catatan Reviewer:</p>
+                    <div class="bg-white ${colorCatatan.text} border border-gray-500 rounded-md p-4 text-sm leading-relaxed whitespace-pre-line">${review.catatan}
+                    </div>
+                  </div>
+                  <div class="mt-2">
+                    <a href="${review.link}" target="_blank" class="text-blue-600 hover:underline text-sm">Lihat Lampiran</a>
+                  </div>
+                `;
+              
+                  container.appendChild(item);
+                });
         }
 
         function closeModalReview() {
-          document.getElementById('modalReview').classList.add('hidden');
+            document.getElementById('modalReview').classList.add('hidden');
         }
 
         function tutupModalError() {
             document.getElementById('modalError').classList.add('hidden');
             document.getElementById('modalError').classList.remove('flex');
         }
-
+    
         function tutupModalSuccess() {
             const modal = document.getElementById('modalSuccess');
             if (modal) modal.classList.add('hidden');

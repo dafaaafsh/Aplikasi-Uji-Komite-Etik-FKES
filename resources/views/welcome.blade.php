@@ -146,7 +146,7 @@
                 
               </div>
               <div class="relative mt-8 flex items-center gap-x-4">
-                <img src="{{ asset("storage/". $item->peneliti->avatar_path )}}" alt="Profil" class="size-10 rounded-full bg-gray-50">
+                <img src="{{ asset("public/". $item->peneliti->avatar_path )}}" alt="Profil" class="size-10 rounded-full bg-gray-50">
                 <div class="text-sm/6">
                   <p class="font-semibold text-gray-900">
                     <a href="login">

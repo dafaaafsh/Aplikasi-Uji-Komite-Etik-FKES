@@ -107,7 +107,7 @@ class PenelitiController extends Controller
         // Simpan ke database
         protocols::create($dataNomor);
 
-        return redirect()->back()->with('success', 'Data berhasil disimpan!');
+        return redirect()->back()->with('success', 'Permohonan berhasil disimpan!');
     }
 
     public function getDetailProtokol($id){
@@ -119,7 +119,7 @@ class PenelitiController extends Controller
             'pembayaran' => $protocol->verified_pembayaran,
             'status_pembayaran' => $protocol->status_pembayaran,
             'tarif' => $protocol->tarif,
-            'peneliti_utama' => $protocol->peneliti->name,
+            'nama' => $protocol->peneliti->name,
             'tanggal_pengajuan' => $protocol->created_at->toDateString(),
             'status' => $protocol->status_penelitian,
         ]);

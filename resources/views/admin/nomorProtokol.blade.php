@@ -249,7 +249,7 @@
         </div>
     </div>
 
-    {{-- modal status input --}}
+    {{-- modal status --}}
     @if ($errors->any())
         <div id="modalError" class="fixed flex inset-0 bg-black/70 bg-opacity-50 z-50 justify-center items-center">
             <div class="bg-red-100 border border-red-800 rounded-lg shadow-lg w-full max-w-md p-6 h-fit max-h-md">

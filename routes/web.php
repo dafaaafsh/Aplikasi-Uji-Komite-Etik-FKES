@@ -13,7 +13,6 @@ use App\Http\Controllers\PengujiController;
 use App\Http\Controllers\PenelitiController;
 use App\Http\Controllers\KeputusanController;
 use App\Http\Controllers\PasswordController;
-use App\Http\Controllers\SuratController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 // Halaman umum
@@ -132,6 +131,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // akses file
+//file protokol
 Route::get('/private/protokol/{nomor_protokol}/{filename}', function ($nomor_protokol,$filename){
     $path = storage_path('app/private/protokol/'.$nomor_protokol.'/'.$filename);
 
@@ -142,6 +142,18 @@ Route::get('/private/protokol/{nomor_protokol}/{filename}', function ($nomor_pro
     return response()->file($path);
 });
 
+//file avatar
+Route::get('/public/avatars/{filename}', function ($filename){
+    $path = storage_path('app/public/avatars'.'/'.$filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+});
+
+//file lampiran
 Route::get('/private/lampiran/{nomor_protokol}/{filename}', function ($nomor_protokol,$filename){
     $path = storage_path('app/private/lampiran/'.$nomor_protokol.'/'.$filename);
 
@@ -152,6 +164,7 @@ Route::get('/private/lampiran/{nomor_protokol}/{filename}', function ($nomor_pro
     return response()->file($path);
 });
 
+//file template
 Route::get('/template/view/{filename}', function ($filename) {
     $path = storage_path('app/private/template/' . $filename);
 
@@ -167,7 +180,7 @@ Route::get('/template/view/{filename}', function ($filename) {
     ]);
 })->where('filename', '.*')->middleware('auth');
 
-
+//file pembayaran
 Route::get('/private/pembayaran/{filename}', function ($filename){
     $path = storage_path('app/private/pembayaran/'.$filename);
 

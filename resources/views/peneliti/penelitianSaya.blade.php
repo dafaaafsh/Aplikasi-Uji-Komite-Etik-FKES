@@ -130,7 +130,7 @@
         @forelse ($protocols as $item)
         <tr class="hover:bg-yellow-100 transition-all duration-150 ease-in-out @if(in_array($item->status_penelitian, ['Ditolak', 'Dikembalikan'])) text-red-600 @endif">
           <td class="p-3 font-mono font-bold text-center text-blue-900">{{ $item->nomor_protokol_asli}}</td>
-          <td class="p-3">{{ Str::words($item->judul, 10); }}</td>
+          <td class="p-3">{{ Str::words($item->judul, 10) }}</td>
           <td class="p-3">{{ $item->peneliti->name }}</td>
           <td class="p-3 text-center">{{ $item->created_at->translatedFormat('D, j F Y') }}</td>
           <td class="p-3 text-center">

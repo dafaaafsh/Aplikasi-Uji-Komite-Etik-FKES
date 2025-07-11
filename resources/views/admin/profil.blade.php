@@ -10,7 +10,7 @@
           <div class="flex items-center space-x-4">
             <img 
               @if (!empty($user->avatar_path))
-                src="{{ asset("storage/". $user->avatar_path )}}"
+                src="{{ asset("public/". $user->avatar_path )}}"
               @else
                 src="https://media.istockphoto.com/id/1330286085/vector/male-avatar-icon.jpg?s=612x612&w=is&k=20&c=U9zDXcxk0pkE6Yz0MtNOwW1LG1Njkzglx7Wtp16-ho4="
               @endif

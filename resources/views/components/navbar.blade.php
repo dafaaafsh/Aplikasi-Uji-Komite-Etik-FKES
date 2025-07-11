@@ -9,8 +9,6 @@
             <div class="pr-3">
 
                 @php
-                    use App\Models\User;
-
                     $profil = Auth::user();
                 @endphp
 
@@ -22,7 +20,7 @@
             <a href="../{{ $profil->role }}/profil">
                 <img 
                 @if (!empty($profil->avatar_path))
-                    src="{{ asset("storage/". $profil->avatar_path )}}"
+                    src="{{ asset("public/". $profil->avatar_path )}}"
                 @else
                     src="https://media.istockphoto.com/id/1330286085/vector/male-avatar-icon.jpg?s=612x612&w=is&k=20&c=U9zDXcxk0pkE6Yz0MtNOwW1LG1Njkzglx7Wtp16-ho4="
                 @endif

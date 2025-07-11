@@ -10,7 +10,7 @@
           <div class="flex items-center space-x-4">
             <img 
               @if (!empty($user->avatar_path))
-                src="{{ asset("storage/". $user->avatar_path )}}"
+                src="{{ asset("public/". $user->avatar_path )}}"
               @else
                 src="https://media.istockphoto.com/id/1330286085/vector/male-avatar-icon.jpg?s=612x612&w=is&k=20&c=U9zDXcxk0pkE6Yz0MtNOwW1LG1Njkzglx7Wtp16-ho4="
               @endif
@@ -19,6 +19,7 @@
                 <p class="text-lg font-semibold text-gray-700 flex gap-1">
                     <span>{{ $user['name'] }}</span>
                         
+                    {{-- logo verify --}}
                     @if (!empty($user->email_verified_at))
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5 mt-1 text-green-800">
                             <path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.883l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" />
@@ -42,6 +43,7 @@
         
       </div>
 
+      {{-- modal status --}}
       @if ($errors->any())
         <div id="modalError" class="fixed flex inset-0 bg-black/70 bg-opacity-50 z-50 justify-center items-center">
             <div class="bg-red-100 border border-red-800 rounded-lg shadow-lg w-full max-w-md p-6 h-fit max-h-md">
@@ -239,8 +241,6 @@
     </form>
   </div>
 </div>
-
-
 
 <script>
   function tutupModalError() {
