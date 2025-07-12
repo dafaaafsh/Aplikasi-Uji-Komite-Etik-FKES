@@ -10,43 +10,43 @@
       <div class="space-y-6">
 
         {{-- Surat Permohonan --}}
-        <x-template-card 
+        <x-templatecard 
           title="Template Surat Permohonan"
           description="Dokumen resmi yang menyatakan permohonan kepada Komite Etik Penelitian Kesehatan (KEPK) untuk melakukan peninjauan protokol penelitian. Wajib ditandatangani oleh peneliti utama." 
           filename="template-surat-permohonan-etik.docx" />
       
         {{-- Surat Pernyataan Komitmen --}}
-        <x-template-card 
+        <x-templatecard 
           title="Template Surat Pernyataan Komitmen"
           description="Berisi pernyataan integritas dan tanggung jawab peneliti utama atas pelaksanaan penelitian, termasuk kepatuhan terhadap prinsip-prinsip etik dan perlindungan subjek penelitian." 
           filename="template-surat-pernyataan-komitmen-etik.docx" />
       
         {{-- CV Peneliti Dosen --}}
-        <x-template-card 
+        <x-templatecard 
           title="Curriculum Vitae Peneliti (Dosen)"
           description="Format daftar riwayat hidup untuk dosen yang terlibat sebagai peneliti, mencakup informasi akademik, pengalaman penelitian, publikasi, dan peran dalam proyek." 
           filename="CURICULLUM-VITAE-PENELITI-dosen.docx" />
       
         {{-- CV Peneliti Utama --}}
-        <x-template-card 
+        <x-templatecard 
           title="Curriculum Vitae Peneliti Utama"
           description="Daftar riwayat hidup peneliti utama yang bertanggung jawab penuh atas protokol penelitian. Digunakan untuk menilai kompetensi dan rekam jejak peneliti." 
           filename="CURICULLUM-VITAE-PENELITI-UTAMA.docx" />
       
         {{-- Inform Consent --}}
-        <x-template-card 
+        <x-templatecard 
           title="Inform Consent Penelitian"
           description="Dokumen persetujuan tertulis yang diberikan kepada partisipan penelitian untuk memahami tujuan, manfaat, risiko, serta hak dan kewajiban sebelum mereka setuju untuk berpartisipasi." 
           filename="INFORM-CONSENT-PERNYATAAN-PERSETUJUAN.docx" />
       
         {{-- Protokol Etik Kualitatif --}}
-        <x-template-card 
+        <x-templatecard 
           title="Protokol Etik - Kualitatif Observasional"
           description="Format protokol untuk penelitian observasional yang bersifat kualitatif, termasuk latar belakang, tujuan, metode pengumpulan data, perlindungan data, dan pertimbangan etik lainnya." 
           filename="PROTOKOL-ETIK-PENELITIAN-KUALITATIF-OBSERVASIONAL.docx" />
       
         {{-- Protokol Etik Kuantitatif --}}
-        <x-template-card 
+        <x-templatecard 
           title="Protokol Etik - Kuantitatif Intervensi"
           description="Format protokol untuk penelitian kuantitatif dengan intervensi, mencakup desain penelitian, sampel, instrumen, prosedur intervensi, dan justifikasi etik terkait risiko dan manfaat." 
           filename="PROTOKOL-ETIK-PENELITIAN-KUANTITATIF-INTERVENSI.docx" />

@@ -9,7 +9,7 @@
 
         <div class="overflow-x-auto bg-white rounded-lg shadow border border-gray-200">
             <table class="min-w-full text-sm text-left divide-y divide-gray-200">
-                <thead class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider">
+                <thead class="text-center bg-gray-100 text-gray-600 text-xs uppercase tracking-wider">
                     <tr>
                         <th class="px-4 py-3">No. Protokol</th>
                         <th class="px-4 py-3">Judul Protokol</th>
@@ -37,7 +37,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-4 py-4 text-center text-gray-500">Belum ada penelitian.</td>
+                            <td colspan="5" class="italic font-semibold px-4 py-4 text-center text-gray-500">Belum ada penelitian yang selesai.</td>
                         </tr>
                     @endforelse
                 </tbody>

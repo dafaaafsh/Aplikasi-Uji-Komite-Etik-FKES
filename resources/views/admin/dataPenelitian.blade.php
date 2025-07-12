@@ -73,7 +73,7 @@
           </tr>
         </thead>
         <tbody id="monitoringTable">
-          @foreach($protocols as $index => $protokol)
+          @forelse($protocols as $index => $protokol)
           <tr class="border-t hover:bg-gray-50">
             <td class="px-4 py-2">{{ $loop->iteration }}</td>
             <td class="px-4 py-2">{{ $protokol->nomor_protokol_asli }}</td>
@@ -120,7 +120,12 @@
                 @endif
             </td>
           </tr>
-          @endforeach
+          @empty
+          <tr>
+            <td colspan="8" class="italic font-semibold px-4 py-4 text-center text-gray-500">
+              Belum ada penelitian yang terdaftar.
+            </td>
+          @endforelse
         </tbody>
       </table>
     </div>
