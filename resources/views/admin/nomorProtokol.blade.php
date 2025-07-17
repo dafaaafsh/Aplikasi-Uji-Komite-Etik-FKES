@@ -80,6 +80,7 @@
                         <th class="px-4 py-4 text-center">Judul</th>
                         <th class="px-4 py-4 text-center">Peneliti</th>
                         <th class="px-4 py-4 text-center">Status</th>
+                        <th class="px-4 py-4 text-center">Virtual Account</th>
                         <th class="px-4 py-4 text-center">Bukti Pembayaran</th>
                         <th class="px-4 py-4 text-center">Aksi</th>
                     </tr>                    
@@ -103,13 +104,22 @@
                                 text-gray-500 italic
                             } @endif
                         ">
-                        @if ($item->tarif ==null)
+                        @if ($item->tarif == null)
                         <button onclick="modaltarif({{ $item->id }})">
                             <span class="italic hover:text-gray-700 hover:underline">Belum ditentukan</span>
                         </button>
                         @else
                             {{ $item->status_pembayaran }}
                         @endif
+                        </td>
+                        <td class="px-2 py-3 text-center font-semibold">
+                            @if ($item->tarif == null)
+                            <button onclick="modaltarif({{ $item->id }})">
+                                <span class="hover:text-gray-500 hover:underline">{{$item->va}}</span>
+                            </button>
+                            @else
+                                <span class="hover:text-gray-700">{{$item->va}}</span>
+                            @endif
                         </td>
                         <td class="px-2 py-3 text-center font-semibold">
                             <button onclick="openBukti({{ $item->id }})"

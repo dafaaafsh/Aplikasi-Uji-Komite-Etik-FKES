@@ -70,7 +70,7 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-300">
           @forelse ($protocols as $item) 
-            <tr class="odd:bg-white even:bg-gray-200">
+            <tr class="odd:bg-white even:bg-gray-200 text-center">
               @if (!empty($item->nomor_protokol))
                 <td class="px-6 py-4 text-blue-600 text-center font-medium">{{ $item->nomor_protokol_asli }}</td>
               @else
@@ -105,7 +105,7 @@
                   @if (empty($item->tarif))
                     <span class="text-gray-500 italic">Belum ditentukan</span>
                   @else
-                    <a onclick="openQr()" class="hover:underline">Perlu Dibayar</a>
+                    <a onclick="openDetail({{$item->id}})" class="hover:underline">Perlu Dibayar</a>
                   @endif
                 @endif
                 <td class="px-6 py-4">
@@ -297,7 +297,7 @@
 <div id="detailModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-200">
   <div class="bg-white w-[400px] p-6 rounded-lg shadow-xl relative">
     <button onclick="closeDetail()" class="absolute top-2 right-2 text-gray-500 hover:text-black">&times;</button>
-    <h2 class="text-lg font-bold mb-3">Detail Pembayaran</h2>
+    <h2 class="text-xl font-bold text-gray-800 mb-3">Detail Pembayaran</h2>
     
     <div id="modalContent">
       <p class="text-sm text-blue-700 mb-1"><strong>Nomor Protokol:</strong> <span id="nomor-protokol"></span></p>
@@ -309,42 +309,31 @@
       <p class="text-sm text-gray-700 mb-1"><strong>Jumlah Pembayaran:</strong> <span id="tarif"></span></p>
     </div>
 
+    
+    <div class="mt-4" id="paymentInfo">
+      <hr class="mt-6 mb-4 border-gray-500">
+      <h2 class="text-xl font-bold text-gray-800 mb-3">Informasi Pembayaran</h2>
+      <p class="text-sm text-gray-600 mb-4">Silakan transfer ke rekening berikut:</p>
+
+      <div class="bg-gray-100 border border-gray-300 rounded-lg p-4 text-left mb-4">
+        <p class="text-sm text-gray-700 font-medium">Bank:</p>
+        <p class="text-lg font-bold text-gray-900 mb-2">BNI</p>
+
+        <p class="text-sm text-gray-700 font-medium">Nomor Virtual Account:</p>
+        <p class="text-lg font-bold text-blue-700 tracking-wide" id="va"></p>
+
+        <p class="text-sm text-gray-700 font-medium mt-3">Atas Nama:</p>
+        <p class="text-lg font-semibold text-gray-900">Fakultas Kesehatan Universitas Nurul Jadid</p>
+      </div>
+    </div>
+    
+
       <div class="flex justify-between mt-6">
         <button onclick="closeDetail()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm">
           Tutup
         </button>
-        
-        <button id="bayarButton" onclick="openQr()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
-          Bayar Sekarang
-        </button>
-        
       </div>
 
-  </div>
-</div>
-
-{{-- Modal Pembayaran --}}
-<div id="modalQRCode" class="fixed inset-0 z-50 hidden backdrop-blur-sm bg-black/40 items-center justify-center transition-opacity duration-300">
-  <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl text-center">
-    <h2 class="text-xl font-bold text-gray-800 mb-3">Informasi Pembayaran</h2>
-    <p class="text-sm text-gray-600 mb-4">Silakan transfer ke rekening berikut:</p>
-
-    <div class="bg-gray-100 border border-gray-300 rounded-lg p-4 text-left mb-4">
-      <p class="text-sm text-gray-700 font-medium">Bank:</p>
-      <p class="text-lg font-bold text-gray-900 mb-2">BNI</p>
-
-      <p class="text-sm text-gray-700 font-medium">Nomor Rekening:</p>
-      <p class="text-lg font-bold text-blue-700 tracking-wide">790071059</p>
-
-      <p class="text-sm text-gray-700 font-medium mt-3">Atas Nama:</p>
-      <p class="text-lg font-semibold text-gray-900">Fakultas Kesehatan Universitas Nurul Jadid</p>
-    </div>
-
-    <p class="text-sm text-gray-500 mb-4">Setelah pembayaran berhasil, silakan upload bukti pembayaran melalui tombol upload yang tersedia.</p>
-
-    <button onclick="closeQr()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm">
-      Kembali
-    </button>
   </div>
 </div>
 
@@ -422,6 +411,7 @@
             document.getElementById('nama-peneliti').textContent = data.nama || 'Tidak ada data';
             document.getElementById('status-pembayaran').textContent = data.status_pembayaran || 'Tidak ada data';
             document.getElementById('tanggal-pembayaran').textContent = data.pembayaran ?? '-';
+            document.getElementById('va').textContent = data.va ?? '-';
             if (data.tarif === null || data.tarif === 0) {
               data.tarif = 'Belum ditentukan';
             }
@@ -430,15 +420,12 @@
               document.getElementById('tarif').textContent = data.tarif;
             }
 
-            const bayarButton = document.getElementById('bayarButton');
-            if (!data.verified_pembayaran) {
-              bayarButton.classList.remove('hidden');
-              bayarButton.classList.add('block');
+            if (data.status_pembayaran === 'Diterima') {
+              document.getElementById('paymentInfo').classList.add('hidden');
             } else {
-              bayarButton.classList.remove('block');
-              bayarButton.classList.add('hidden');
+              document.getElementById('paymentInfo').classList.remove('hidden');
             }
-          
+
             // Tampilkan modal
             const modal = document.getElementById('detailModal');
             modal.classList.remove('hidden');

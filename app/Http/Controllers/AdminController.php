@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
@@ -218,12 +219,29 @@ class AdminController extends Controller
 
     public function terimaBukti($id)
     {
-        $protocol = Protocols::findOrFail($id);
-        $protocol->status_pembayaran = 'Diterima';
-        $protocol->verified_pembayaran = now();
-        $protocol->save();
+        DB::beginTransaction();
+        try {
+            $protocol = Protocols::findOrFail($id);
+            $protocol->status_pembayaran = 'Diterima';
+            $protocol->verified_pembayaran = now();
+            $protocol->save();
 
-        return response()->json(['success' => 'Bukti pembayaran diterima']);
+            $protocol->nomor_protokol = "KEPK".$protocol->va;
+            $protocol->nomor_protokol_asli = $protocol->va_slash;
+            $protocol->save();
+
+            $folder = "protokol/{$protocol->nomor_protokol}";
+            if (!Storage::disk('local')->exists($folder)) {
+                Storage::disk('local')->makeDirectory($folder);
+            }
+
+            DB::commit();
+
+            return response()->json(['success' => 'Bukti pembayaran diterima']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Terjadi kesalahan saat memproses bukti pembayaran'], 500);
+        }
     }
 
     public function getDetail($id){
@@ -430,13 +448,31 @@ class AdminController extends Controller
             ->whereNotNull('nomor_protokol')
             ->where('status_telaah', 'Selesai')
             ->latest()
-            ->paginate(15);
+            ->get();
 
+        $protocolWithoutSurat = protocols::whereHas('putusan', function ($query) {
+            $query->whereNull('path');
+        })->latest()->get();
+   
         return view('admin.suratLulus', [
             'title' => 'Buat Surat Lulus',
-            'protokols' => $protocols
+            'protokols' => $protocols,
+            'protocolWithoutSurat' => $protocolWithoutSurat
         ]);
     }    
+
+    public function getDataProtokol($id){
+        $protocol = protocols::with('peneliti')->findOrFail($id);
+        
+        return response()->json([
+            'id' => $protocol->id,
+            'nomor_protokol' => $protocol->nomor_protokol_asli,
+            'judul_penelitian' => $protocol->judul,
+            'nama_peneliti' => optional($protocol->peneliti)->name ?? '-',
+            'institusi' => optional($protocol->peneliti)->institusi ?? '-',
+            'tanggal_persetujuan' => optional($protocol->tanggal_pengajuan)?->format('Y-m-d'),
+        ]);
+    }
 
     public function storeSurat(Request $request)
     {

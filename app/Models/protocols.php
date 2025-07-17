@@ -20,6 +20,8 @@ class protocols extends Model
         'jenis_pengajuan',
         'biaya_penelitian',
         'status_penelitian',
+        'va',
+        'va_slash',
         'nomor_protokol',
         'nomor_protokol_asli',
         'tanggal_pengajuan',

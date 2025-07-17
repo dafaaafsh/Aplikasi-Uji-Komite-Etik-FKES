@@ -76,6 +76,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':Admin'])->group(function ()
         Route::get('/admin/detailPenelitian/${id}', [AdminController::class, 'getDataPenelitian'])->name('admin.detailDataPenelitian');
         Route::post('/admin/suratLulus/upload/{id}', [AdminController::class, 'uploadSuratLulus'])->name('admin.uploadSuratLulus');
         Route::get('/admin/suratLulus', [AdminController::class, 'suratLulus'])->name('admin.suratLulus');
+        Route::get('/admin/protokol/{id}/data',[AdminController::class, 'getDataProtokol'])->name('admin.protokol.data');
         Route::post('/admin/suratLulus/store', [AdminController::class, 'storeSurat'])->name('admin.surat-lulus.store');
     });
 

@@ -6,9 +6,11 @@ use App\Models\document;
 use App\Models\User;
 use App\Models\protocols;
 use App\Models\Review;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 use function Laravel\Prompts\error;
@@ -78,36 +80,59 @@ class PenelitiController extends Controller
     }
 
     public function storeNomor(Request $request){
-        $request->validate([
-            'judul' => 'required',
-            'subjek' => 'required',
-            'jenis_penelitian' => 'required',
-            'jenis_pengajuan' => 'required',
-            'biaya_penelitian' => 'required',
-            'agreement' => 'required',
-        ],[
-            'judul' => 'Harap Lengkapi Data',
-            'subjek' => 'Harap Lengkapi Data',
-            'jenis_penelitian' => 'Harap Lengkapi Data',
-            'jenis_pengajuan' => 'Harap Lengkapi Data',
-            'biaya_penelitian' => 'Harap Lengkapi Data',
-            'agreement' => 'Persetujuan belum dicentang'
-        ]);
+        DB::beginTransaction();
+        try {
+            $request->validate([
+                'judul' => 'required',
+                'subjek' => 'required',
+                'jenis_penelitian' => 'required',
+                'jenis_pengajuan' => 'required',
+                'biaya_penelitian' => 'required',
+                'agreement' => 'required',
+            ],[
+                'judul' => 'Harap Lengkapi Data',
+                'subjek' => 'Harap Lengkapi Data',
+                'jenis_penelitian' => 'Harap Lengkapi Data',
+                'jenis_pengajuan' => 'Harap Lengkapi Data',
+                'biaya_penelitian' => 'Harap Lengkapi Data',
+                'agreement' => 'Persetujuan belum dicentang'
+            ]);
 
-        // Validasi input
-        $dataNomor = [
-            'user_id' => Auth::user()->id,  
-            'judul' => $request->judul,
-            'subjek' => $request->subjek,
-            'jenis_penelitian' => $request->jenis_penelitian,
-            'jenis_pengajuan' => $request->jenis_pengajuan,
-            'biaya_penelitian' => $request->biaya_penelitian
-        ];
+            $now = Carbon::now();
+            $count = protocols::whereMonth('created_at', $now->month)
+                ->whereYear('created_at', $now->year)
+                ->count();
+
+            $noUrut = str_pad($count + 1, 3, '0', STR_PAD_LEFT);
+            $bulan = $now->format('m');
+            $tahun = $now->format('Y');
+            $va_slash = "KEPK/$bulan/$tahun/$noUrut";
+            $va = $bulan.$tahun.$noUrut;
+
+            // Validasi input
+            $dataNomor = [
+                'user_id' => Auth::user()->id,  
+                'judul' => $request->judul,
+                'subjek' => $request->subjek,
+                'jenis_penelitian' => $request->jenis_penelitian,
+                'jenis_pengajuan' => $request->jenis_pengajuan,
+                'biaya_penelitian' => $request->biaya_penelitian,
+                'va_slash' => $va_slash,
+                'va' => $va,
+            ];
+
+            // Simpan data ke database
+            protocols::create($dataNomor);
+            DB::commit();
+
+            // Redirect dengan pesan sukses
+            return redirect()->back()->with('success', 'Permohonan berhasil disimpan!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Terjadi kesalahan saat mengajukan permohonan'], 500);
+        }
 
         // Simpan ke database
-        protocols::create($dataNomor);
-
-        return redirect()->back()->with('success', 'Permohonan berhasil disimpan!');
     }
 
     public function getDetailProtokol($id){
@@ -122,6 +147,7 @@ class PenelitiController extends Controller
             'nama' => $protocol->peneliti->name,
             'tanggal_pengajuan' => $protocol->created_at->toDateString(),
             'status' => $protocol->status_penelitian,
+            'va' => $protocol->va,
         ]);
     }
 
@@ -264,16 +290,19 @@ class PenelitiController extends Controller
     public function getKeputusan($id)
     {
         $putusan = \App\Models\Keputusan::where('protokol_id', $id)->with('protokol')->first();
+        $getFile = null;
 
         if (!$putusan) {
             return response()->json([]);
         }
 
-        $getFile = asset('private/protokol/'.$putusan->protokol->nomor_protokol.'/'.$putusan->path);
+        if ($putusan->path) {
+            $getFile = asset('private/protokol/'.$putusan->protokol->nomor_protokol.'/'.$putusan->path);
+        }
 
         return response()->json([
             'hasil_akhir' => $putusan->hasil_akhir,
-            'catatan' => $putusan->catatan,
+            'catatan' => $putusan->komentar,
             'tanggal' => $putusan->created_at->toDateString(),
             'path' => $getFile
         ]);

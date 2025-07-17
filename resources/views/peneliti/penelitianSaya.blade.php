@@ -634,13 +634,15 @@
         
           <div>
             <p class="font-medium text-gray-600 mt-4">Komentar Tambahan:</p>
-            <p class="whitespace-pre-line">${data.catatan ?? 'Tidak ada catatan tambahan.'}</p>
+            <p class="whitespace-pre-line text-gray-600">${data.catatan ?? 'Tidak ada catatan tambahan.'}</p>
           </div>
 
           <div class="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 transition">
             <span class="font-medium text-gray-800">Surat Lulus Etik</span>
-            <a href="${data.path}" target="_blank"
-               class="text-blue-600 hover:underline ">Lihat File</a>
+            ${data.path ? 
+              `<a href="${data.path}" target="_blank" class="text-blue-600 hover:underline">Lihat File</a>` : 
+              `<span class="text-gray-500 italic">Belum ada file</span>`
+            }
           </div>
         `;
       }

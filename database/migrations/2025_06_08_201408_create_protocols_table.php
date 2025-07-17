@@ -20,6 +20,8 @@ return new class extends Migration
             $table->enum('jenis_pengajuan',['Telaah Awal','Pengiriman Ulang Untuk Telaah Ulang','Amandemen Protokol','Telaah Lanjutan Untuk Protokol Yang disetujui', 'Penghentian Studi']);
             $table->enum('biaya_penelitian',['Sponsor','Mandiri']);
             $table->enum('status_penelitian',['Diperiksa','Ditelaah','Dikembalikan','Selesai'])->default('diperiksa');
+            $table->string('va')->nullable();
+            $table->string('va_slash')->nullable();
             $table->string('nomor_protokol')->nullable();
             $table->string('nomor_protokol_asli')->nullable();
             $table->string('tarif')->nullable();

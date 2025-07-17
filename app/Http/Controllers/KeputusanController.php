@@ -27,6 +27,11 @@ class KeputusanController extends Controller
         $protokol = Protocols::findOrFail($validated['protokol_id']);
 
         if ($validated['hasil_akhir'] === 'Diterima') {
+
+            if (!isset($validated['file_keputusan'])) {
+                return redirect()->back()->withErrors(['file_keputusan' => 'File keputusan harus diunggah saat hasil akhir diterima.']);
+            }
+
             $file = $validated['file_keputusan'];
             $nomorProtokol = $protokol->nomor_protokol;
             $path = 'lampiran/'.$nomorProtokol;

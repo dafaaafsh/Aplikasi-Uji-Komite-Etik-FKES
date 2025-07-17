@@ -27,7 +27,7 @@
                             <td class="px-4 py-3">{{ $protokol->putusan->created_at->format('d M Y') }}</td>
                             <td class="px-4 py-3">
                                 @if($protokol->putusan->path)
-                                    <a href="#"
+                                    <a href="/private/protokol/{{$protokol->nomor_protokol}}/{{ $protokol->putusan->path }}" target="_blank"
                                        class="text-green-600 hover:underline">
                                         Telah Upload
                                     </a>
@@ -65,7 +65,7 @@
                     <select name="protokol_id" id="protokol_id" required
                         class="w-full mt-1 border-gray-300 rounded shadow-sm focus:ring focus:ring-blue-200">
                         <option value="">-- Pilih Protokol --</option>
-                        @foreach($protokols as $protokol)
+                        @foreach($protocolWithoutSurat as $protokol)
                             <option value="{{ $protokol->id }}" {{ old('protokol_id') == $protokol->id ? 'selected' : '' }}>
                                 {{ $protokol->nomor_protokol_asli }} - {{ $protokol->judul }}
                             </option>
@@ -119,15 +119,28 @@
         if (!protokolId) return;
 
         fetch(`/admin/protokol/${protokolId}/data`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('nama_peneliti').value = data.nama_peneliti || '';
-                document.getElementById('institusi').value = data.institusi || '';
-                document.getElementById('judul_penelitian').value = data.judul_penelitian || '';
-                document.getElementById('nomor_protokol').value = data.nomor_protokol || '';
-                document.getElementById('tanggal_persetujuan').value = data.tanggal_persetujuan || '';
-            })
-            .catch(error => console.error('Gagal mengambil data protokol:', error));
+    .then(async response => {
+        const contentType = response.headers.get("content-type");
+        
+        if (!response.ok) {
+            throw new Error("Gagal fetch. Status: " + response.status);
+        }
+
+        if (contentType && contentType.includes("application/json")) {
+            return response.json();
+        } else {
+            const html = await response.text();
+            throw new Error("Respon bukan JSON:\n" + html);
+        }
+    })
+    .then(data => {
+        document.getElementById('nama_peneliti').value = data.nama_peneliti || '';
+        document.getElementById('institusi').value = data.institusi || '';
+        document.getElementById('judul_penelitian').value = data.judul_penelitian || '';
+        document.getElementById('nomor_protokol').value = data.nomor_protokol || '';
+        document.getElementById('tanggal_persetujuan').value = data.tanggal_persetujuan || '';
+    })
+    .catch(error => console.error('Gagal mengambil data protokol:', error));
     });
     </script>
 
