@@ -301,6 +301,15 @@ class AdminController extends Controller
 
         return redirect()->back()->with('success', 'Pengguna berhasil ditambahkan.');
     }
+
+    public function detailUser($id)
+    {
+        $user = User::findOrFail($id);
+        return view('admin.detailUser', [
+            'title' => 'Detail Pengguna',
+            'user' => $user
+        ]);
+    }
     
     public function updateUser(Request $request){
         $validated = $request->validate([
@@ -309,15 +318,40 @@ class AdminController extends Controller
             'email' => 'required|email|unique:users,email,' . $request->id,
             'role' => 'required|in:Admin,Penguji,Kepk,Peneliti',
         ]);
-    
+
         $user = User::findOrFail($validated['id']);
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->role = $validated['role'];
-        $user->email_verified_at = null;
+        // Jika email berubah, reset verifikasi
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        // Verifikasi KTP
+        if ($request->has('verif_ktp')) {
+            $user->ktp_verified_at = now();
+            $user->ktp_status = 'Terverifikasi';
+            $user->ktp_reject_reason = null;
+            $user->save();
+            return redirect()->route('admin.users.detail', $user->id)->with('success', 'KTP berhasil diverifikasi.');
+        }
+
+        // Kembalikan KTP
+        if ($request->has('kembalikan_ktp')) {
+            $user->ktp_verified_at = null;
+            $user->ktp_status = 'Ditolak';
+            $user->ktp_reject_reason = $request->input('alasan');
+            if ($user->ktp_path) {
+                Storage::disk('local')->delete( $user->ktp_path);
+                $user->ktp_path = null;
+            }
+            $user->save();
+            return redirect()->route('admin.users.detail', $user->id)->with('success', 'KTP berhasil dikembalikan ke user.');
+        }
+
         $user->save();
-    
-        return redirect()->back()->with('success', 'Pengguna berhasil diperbarui.');
+        return redirect()->route('admin.users.detail', $user->id)->with('success', 'Pengguna berhasil diperbarui.');
     }
 
     public function destroyUser(Request $request){
@@ -328,7 +362,7 @@ class AdminController extends Controller
         $user = User::findOrFail($validated['id']);
         $user->delete();
 
-        return redirect()->back()->with('success', 'Pengguna berhasil dihapus.');
+        return redirect()->route('admin.kelolaUser')->with('success', 'Pengguna berhasil dihapus.');
     }
 
     public function getDetailPengajuan($id){

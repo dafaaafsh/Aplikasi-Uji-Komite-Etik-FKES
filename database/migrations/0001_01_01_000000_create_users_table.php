@@ -26,6 +26,10 @@ return new class extends Migration
             $table->enum('asal_peneliti',['UNUJA','Eksternal'])->nullable();
 
             $table->string('avatar_path')->nullable();
+            $table->string('ktp_path')->nullable();
+            $table->enum('ktp_status',['Belum diverifikasi','Terverifikasi', 'Ditolak'])->default('Belum diverifikasi');
+            $table->string('ktp_verified_at')->nullable();
+            $table->string('ktp_reject_reason')->nullable();
 
             $table->rememberToken();
             $table->timestamps();

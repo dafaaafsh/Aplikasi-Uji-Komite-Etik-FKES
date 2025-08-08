@@ -182,30 +182,84 @@ class PenelitiController extends Controller
     }
 
     public function updateData(Request $request){
-        $validated = $request->validate([
+        // Validasi input
+        $request->validate([
             'nama' => 'required|string|max:255',
             'hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
             'institusi' => 'nullable|string|max:255',
             'status' => 'nullable|string',
             'asal' => 'nullable|string',
+            'ktp' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048', // Maksimal 2MB
+        ],[
+            'nama.required' => 'Nama Peneliti wajib diisi',
+            'hp.max' => 'Nomor HP tidak boleh lebih dari 20 karakter',
+            'institusi.max' => 'Nama Institusi tidak boleh lebih dari 255 karakter',
+            'status.string' => 'Status Peneliti harus berupa teks',
+            'asal.string' => 'Asal Peneliti harus berupa teks',
+            'ktp.mimes' => 'File KTP harus berupa jpg, jpeg, png, atau pdf',
+            'ktp.max' => 'Ukuran file KTP tidak boleh lebih dari 2MB',
+            'ktp.file' => 'File KTP harus berupa file yang valid',
         ]);
 
         // Ambil data user
-        $user = User::findOrFail($request['id']);
-
+        $user = User::findOrFail(Auth::user()->id);
         // Update data user
-        $user->name = $validated['nama'];
-        $user->nomor_hp = $validated['hp'] ?? null;
-        $user->alamat = $validated['alamat'] ?? null;
-        $user->institusi = $validated['institusi'] ?? null;
-        $user->status_peneliti = $validated['status'] ?? null;
-        $user->asal_peneliti = $validated['asal'] ?? null;
+        $user->name = $request->nama;
+        $user->nomor_hp = $request->hp ?? null;
+        $user->alamat = $request->alamat ?? null;
+        $user->institusi = $request->institusi ?? null;
+        $user->status_peneliti = $request->status ?? null;
+        $user->asal_peneliti = $request->asal ?? null;
+        // Cek apakah ada file KTP yang diupload
+        if ($request->hasFile('ktp')) {
+            $file = $request->file('ktp');
+            $ext = $file->extension();
+            // Hapus file KTP lama jika ada
+            if (!empty($user->ktp_path)) {
+                Storage::disk('local')->delete($user->ktp_path);
+            }
+            // Simpan file KTP baru
+            $path = Storage::disk('local')->putFileAs('ktp', $file, "ktp_".$user->id."_".time().".".$ext);
+            // Update path KTP di database
+            $user->ktp_reject_reason = null; 
+            $user->ktp_path = $path;
+            $user->ktp_status = 'Belum diverifikasi';
 
+
+        } else {
+            // Jika tidak ada file KTP yang diupload, biarkan path KTP tetap null
+            $user->ktp_path = $user->ktp_path ?? null;
+        }
         $user->save();
 
         // Redirect dengan pesan sukses
         return redirect()->back()->with('success', 'Data berhasil diperbarui.');
+
+        // $validated = $request->validate([
+        //     'nama' => 'required|string|max:255',
+        //     'hp' => 'nullable|string|max:20',
+        //     'alamat' => 'nullable|string',
+        //     'institusi' => 'nullable|string|max:255',
+        //     'status' => 'nullable|string',
+        //     'asal' => 'nullable|string',
+        // ]);
+
+        // // Ambil data user
+        // $user = User::findOrFail($request['id']);
+
+        // // Update data user
+        // $user->name = $validated['nama'];
+        // $user->nomor_hp = $validated['hp'] ?? null;
+        // $user->alamat = $validated['alamat'] ?? null;
+        // $user->institusi = $validated['institusi'] ?? null;
+        // $user->status_peneliti = $validated['status'] ?? null;
+        // $user->asal_peneliti = $validated['asal'] ?? null;
+
+        // $user->save();
+
+        // // Redirect dengan pesan sukses
+        // return redirect()->back()->with('success', 'Data berhasil diperbarui.');
 
     }
 

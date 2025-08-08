@@ -1,6 +1,5 @@
 <x-Layout>
     <x-slot:title>{{ $title }}</x-slot>
-
     <p class="mt-2 text-gray-600 text-base">
         Kelola seluruh data pengguna sistem di halaman ini.
         <br>
@@ -8,7 +7,6 @@
         <strong class="font-semibold text-gray-800">mengedit</strong>, 
         <strong class="font-semibold text-gray-800">menghapus</strong> akun pengguna sesuai dengan kebutuhan dan peran masing-masing.
     </p>
-
     <div class="bg-white shadow-md rounded-2xl overflow-hidden my-4">
         <div class="flex px-6 py-4 bg-gradient-to-r from-gray-900 to-gray-700 text-white justify-between rounded-t-2xl gap-x-10">
             <div>
@@ -33,6 +31,7 @@
                         <th class="px-10 py-4 text-center">Nama Pengguna</th>
                         <th class="px-4 py-4 text-center">Email</th>
                         <th class="px-4 py-4 text-center">Status Email</th>
+                        <th class="px-4 py-4 text-center">Status KTP</th>
                         <th class="px-2 py-4 text-center">
                             <form method="GET" action="" class="flex items-center justify-end gap-2">
                                 <label for="role" class="">Role </label>
@@ -70,20 +69,25 @@
                                         <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.72 6.97a.75.75 0 1 0-1.06 1.06L10.94 12l-1.72 1.72a.75.75 0 1 0 1.06 1.06L12 13.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L13.06 12l1.72-1.72a.75.75 0 1 0-1.06-1.06L12 10.94l-1.72-1.72Z" clip-rule="evenodd" />
                                     </svg>
                                 </div>
-                            </div>
                             @endif
-                            
-
+                        </td>
+                        <!-- Status KTP -->
+                        <td class="px-4 py-3 text-center">
+                            @if (!empty($item->ktp_path))
+                                @if (!empty($item->ktp_verified_at))
+                                    <span class="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>Sudah Diverifikasi</span>
+                                @else
+                                    <span class="inline-flex items-center px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-semibold"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" /><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"></circle></svg>Belum Diverifikasi</span>
+                                    <br>
+                                @endif
+                            @else
+                                <span class="text-xs text-gray-400">Belum Upload</span>
+                            @endif
                         </td>
                         <td class="px-2 py-3 text-center font-semibold">{{ $item->role }}</td>
                         <td class="px-4 py-3">
                             <div class="flex gap-2 justify-center">
-                                <button type="button"
-                                onclick="bukaModalEdit('{{ $item->id }}', '{{ $item->name }}', '{{ $item->email }}', '{{ $item->role }}')"
-                                class="px-3 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded">Edit</button>
-                                <button type="button"
-                                onclick="bukaModalHapus('{{ $item->id }}')"
-                                class="px-3 py-1 text-sm text-white bg-red-600 hover:bg-red-700 rounded">Hapus</button>                            
+                                <a href="{{ route('admin.users.detail', $item->id) }}" class="px-3 py-1 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded">Lihat Detail</a>
                             </div>
                         </td>
                     </tr>
@@ -145,55 +149,6 @@
     </div>
     </div>
 
-    <!-- Modal Edit Pengguna -->
-    <div id="modalEditPengguna" class="fixed hidden inset-0 bg-black/60 z-50 justify-center items-center">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 relative">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-gray-800">Edit Pengguna</h3>
-            <button onclick="tutupModalEdit()" class="text-gray-500 hover:text-gray-800 text-2xl font-bold">&times;</button>
-        </div>
-
-        <form method="POST" action="{{ route('admin.users.update') }}" id="formEditUser">
-            @csrf
-            @method('PUT')
-            <input type="hidden" name="id" id="edit_user_id">
-
-            <div class="mb-4">
-                <label for="edit_name" class="block text-sm font-medium text-gray-700">Nama</label>
-                <input type="text" name="name" id="edit_name" required
-                    class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-            </div>
-
-            <div class="mb-4">
-                <label for="edit_email" class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" name="email" id="edit_email" required
-                    class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-            </div>
-
-            <div class="mb-4">
-                <label for="edit_role" class="block text-sm font-medium text-gray-700">Role</label>
-                <select name="role" id="edit_role" required
-                    class="mt-1 w-full rounded-md border-gray-300 shadow-sm focus:ring focus:ring-blue-200">
-                    <option value="">-- Pilih Role --</option>
-                    <option value="Admin">Admin</option>
-                    <option value="Penguji">Penguji</option>
-                    <option value="Kepk">Kepk</option>
-                    <option value="Peneliti">Peneliti</option>
-                </select>
-            </div>
-
-            <div class="flex justify-end gap-2 mt-4">
-                <button type="button" onclick="tutupModalEdit()" class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md">
-                    Batal
-                </button>
-                <button type="submit" class="px-4 py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-md">
-                    Simpan Perubahan
-                </button>
-            </div>
-        </form>
-    </div>
-    </div>
-
     @if ($errors->any())
         <div id="modalError" class="fixed flex inset-0 bg-black/70 bg-opacity-50 z-50 justify-center items-center">
             <div class="bg-red-100 border border-red-800 rounded-lg shadow-lg w-full max-w-md p-6 h-fit max-h-md">
@@ -231,27 +186,6 @@
             </div>
         </div>
     @endif
-
-    <!-- Modal Hapus Pengguna -->
-    <div id="modalHapusPengguna" class="fixed hidden inset-0 bg-black/60 z-50 justify-center items-center">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Konfirmasi Hapus</h3>
-        <p class="text-gray-700 text-sm mb-6">
-            Apakah Anda yakin ingin menghapus pengguna ini? Tindakan ini tidak dapat dibatalkan.
-        </p>
-
-        <form method="POST" action="{{ route('admin.users.destroy') }}" id="formHapusUser">
-            @csrf
-            @method('DELETE')
-            <input type="hidden" name="id" id="hapus_user_id">
-
-            <div class="flex justify-end gap-2">
-                <button type="button" onclick="tutupModalHapus()" class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-md">Batal</button>
-                <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md">Hapus</button>
-            </div>
-        </form>
-    </div>
-    </div>
 
 
     <script>
@@ -303,6 +237,28 @@
             if (modal) modal.classList.add('hidden');
         }
 
+        // Function to open the KTP verification modal
+        function bukaModalVerifKtp(id, name, ktpPath) {
+            const modal = document.getElementById('modalVerifKtp');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('verif_ktp_user_id').value = id;
+            document.getElementById('verifKtpUserName').textContent = name;
+            let preview = '';
+            if (ktpPath && ktpPath.endsWith('.pdf')) {
+                preview = `<a href='/private/${ktpPath}' target='_blank' class='text-blue-600 underline'>Lihat File PDF</a>`;
+            } else if (ktpPath) {
+                preview = `<img src='/private/${ktpPath}' alt='KTP' class='rounded shadow max-h-48'>`;
+            } else {
+                preview = `<span class='text-gray-400'>Tidak ada file KTP</span>`;
+            }
+            document.getElementById('verifKtpPreview').innerHTML = preview;
+        }
+        function tutupModalVerifKtp() {
+            const modal = document.getElementById('modalVerifKtp');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
     </script>
     
 

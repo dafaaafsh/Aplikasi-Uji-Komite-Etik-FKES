@@ -107,16 +107,16 @@
       {{-- Menu Navigasi --}}
       <ul class="divide-y divide-gray-600 md:pt-2">
         <div class="max-md:divide-y py-1 divide-gray-600">
-          <li><x-Nav-Link href="../admin/dashboard" :active="request()->is('admin/dashboard')">Dasbor Admin</x-Nav-Link></li>
-          <li><x-Nav-Link href="../admin/kelolaUser" :active="request()->is('admin/kelolaUser')">Kelola User</x-Nav-Link></li>
+          <li><x-Nav-Link href="{{route('admin.dashboard')}}" :active="request()->is('admin/dashboard')">Dasbor Admin</x-Nav-Link></li>
+          <li><x-Nav-Link href="{{route('admin.kelolaUser')}}" :active="request()->is('admin/kelolaUser')">Kelola User</x-Nav-Link></li>
         </div>
         <div class="max-md:divide-y py-1 divide-gray-600">
-          <li><x-Nav-Link href="../admin/nomorProtokol" :active="request()->is('admin/nomorProtokol')">Nomor Protokol</x-Nav-Link></li>
-          <li><x-Nav-Link href="../admin/pengajuanPenelitian" :active="request()->is('admin/pengajuanPenelitian')">Data Pengajuan</x-Nav-Link></li>
+          <li><x-Nav-Link href="{{route('admin.nomorProtokol')}}" :active="request()->is('admin/nomorProtokol')">Nomor Protokol</x-Nav-Link></li>
+          <li><x-Nav-Link href="{{route('admin.pengajuanPenelitian')}}" :active="request()->is('admin/pengajuanPenelitian')">Data Pengajuan</x-Nav-Link></li>
         </div>
         <div class="max-md:divide-y py-1 divide-gray-600">
-          <li><x-Nav-Link href="../admin/dataPenelitian" :active="request()->is('admin/dataPenelitian')">Data Penelitian</x-Nav-Link></li>
-          <li><x-Nav-Link href="../admin/suratLulus" :active="request()->is('admin/suratLulus')">Buat Surat Lulus</x-Nav-Link></li>
+          <li><x-Nav-Link href="{{route('admin.dataPenelitian')}}" :active="request()->is('admin/dataPenelitian')">Data Penelitian</x-Nav-Link></li>
+          <li><x-Nav-Link href="{{route('admin.suratLulus')}}" :active="request()->is('admin/suratLulus')">Buat Surat Lulus</x-Nav-Link></li>
         </div>
       </ul>
     </div>
@@ -277,7 +277,7 @@
         Batal
       </button>
       
-      <a href="../{{ $profil->role }}/logout">
+      <a href="{{route('logout')}}">
         <button class="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white">
           Keluar
         </button>

@@ -17,6 +17,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 // Halaman umum
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/logout', [SesiController::class,'logout'])->name('logout');    
 
 route::middleware('guest')->group(function(){
     Route::get('/login', [HomeController::class, 'login'])->name('login');
@@ -49,7 +50,6 @@ Route::middleware(['auth', RoleMiddleware::class . ':Peneliti'])->group(function
     Route::post('Peneliti/profil/update',[PenelitiController::class, 'updateData'])->name('peneliti.profil.update');
     Route::post('Peneliti/profil/uploadImage',[PenelitiController::class, 'uploadAvatar'])->name('peneliti.profil.uploadAvatar');
     Route::get('/peneliti/tentangKami', [HomeController::class,'tentang'])->name('tentang.kami');
-    Route::get('/Peneliti/logout', [SesiController::class,'logout'])->name('logout');    
 });
 
 // Admin
@@ -57,8 +57,9 @@ Route::middleware(['auth', RoleMiddleware::class . ':Admin'])->group(function ()
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/kelolaUser', [AdminController::class, 'kelolaUser'])->name('admin.kelolaUser');
     Route::post('/admin/users/store', [AdminController::class, 'storeUser'])->name('admin.users.store');
-    Route::put('/admin/users/update', [AdminController::class, 'updateUser'])->name('admin.users.update');
-    Route::delete('/admin/users/destroy', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
+    Route::post('/admin/users/update', [AdminController::class, 'updateUser'])->name('admin.updateUser');
+    Route::post('/admin/users/destroy', [AdminController::class, 'destroyUser'])->name('admin.destroyUser');
+    Route::get('/admin/users/detail/{id}', [AdminController::class, 'detailUser'])->name('admin.users.detail');
 
     Route::middleware(['verified'])->group(function () {
         Route::get('/admin/nomorProtokol', [AdminController::class,'nomorProtokol'])->name('admin.nomorProtokol');
@@ -83,7 +84,6 @@ Route::middleware(['auth', RoleMiddleware::class . ':Admin'])->group(function ()
     Route::get('/Admin/profil', [AdminController::class, 'profil'])->name('admin.profil');
     Route::post('Admin/profil/update',[PenelitiController::class, 'updateData'])->name('admin.profil.update');
     Route::post('Admin/profil/uploadImage',[PenelitiController::class, 'uploadAvatar'])->name('admin.profil.uploadAvatar');
-    Route::get('/Admin/logout', [SesiController::class,'logout']);
 });
 
 //Sekretaris/KEPK
@@ -106,7 +106,6 @@ Route::middleware(['auth', RoleMiddleware::class . ':Kepk'])->group(function () 
     route::get('/Kepk/profil', [kepkController::class,'profil'])->name('kepk.profil');
     Route::post('Kepk/profil/update',[PenelitiController::class, 'updateData'])->name('kepk.profil.update');
     Route::post('Kepk/profil/uploadImage',[PenelitiController::class, 'uploadAvatar'])->name('kepk.profil.uploadAvatar');
-    route::get('/Kepk/logout', [SesiController::class,'logout']);
 });
 
 //Penguji
@@ -124,7 +123,6 @@ Route::middleware(['auth', RoleMiddleware::class . ':Penguji'])->group(function 
     Route::get('/Penguji/profil', [PengujiController::class,'profil'])->name('kepk.profil');
     Route::post('Penguji/profil/update',[PenelitiController::class, 'updateData'])->name('penguji.profil.update');
     Route::post('Penguji/profil/uploadImage',[PenelitiController::class, 'uploadAvatar'])->name('penguji.profil.uploadAvatar');
-    Route::get('/Penguji/logout', [SesiController::class,'logout']);
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -192,6 +190,17 @@ Route::get('/private/pembayaran/{filename}', function ($filename){
     return response()->file($path);
 });
 
+// file KTP
+Route::get('/private/ktp/{filename}', function ($filename){
+    $path = storage_path('app/private/ktp/'.$filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+});
+
 // verifikasi email
 Route::get('/email/verify', function () {
     return view('auth.verify-email', ['title' => '']);
@@ -208,4 +217,10 @@ Route::post('/email/verification-notification', function (Request $request) {
  
     return back()->with('message', 'Verification link sent!');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+Route::post('/check-email', function (Illuminate\Http\Request $request) {
+    $email = $request->input('email');
+    $exists = \App\Models\User::where('email', $email)->exists();
+    return response()->json(['exists' => $exists]);
+});
 ?>

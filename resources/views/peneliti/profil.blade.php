@@ -10,7 +10,7 @@
           <div class="flex items-center space-x-4">
             <img 
               @if (!empty($user->avatar_path))
-                src="{{ asset("public/". $user->avatar_path )}}"
+                src="{{ asset("storage/". $user->avatar_path )}}"
               @else
                 src="https://media.istockphoto.com/id/1330286085/vector/male-avatar-icon.jpg?s=612x612&w=is&k=20&c=U9zDXcxk0pkE6Yz0MtNOwW1LG1Njkzglx7Wtp16-ho4="
               @endif
@@ -19,7 +19,6 @@
                 <p class="text-lg font-semibold text-gray-700 flex gap-1">
                     <span>{{ $user['name'] }}</span>
                         
-                    {{-- logo verify --}}
                     @if (!empty($user->email_verified_at))
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5 mt-1 text-green-800">
                             <path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.883l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" />
@@ -40,10 +39,8 @@
             <button onclick="openModalAvatar()" class="px-2 py-2 mt-3 mr-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg">Ganti Foto Profil</button>
           </div>
         </div>
-        
       </div>
 
-      {{-- modal status --}}
       @if ($errors->any())
         <div id="modalError" class="fixed flex inset-0 bg-black/70 bg-opacity-50 z-50 justify-center items-center">
             <div class="bg-red-100 border border-red-800 rounded-lg shadow-lg w-full max-w-md p-6 h-fit max-h-md">
@@ -82,7 +79,7 @@
         </div>
       @endif
     
-      <form action="{{ route('peneliti.profil.update') }}" method="POST" class="space-y-6">
+      <form action="{{ route('peneliti.profil.update') }}" method="POST" class="space-y-6" enctype="multipart/form-data">
         @csrf
 
         <input type="hidden" name="id"   value="{{ $user->id }}">
@@ -114,7 +111,7 @@
         </div>
   
         <!-- Afiliasi Peneliti -->
-        <div class="pb-4">
+        <div class="border-b pb-8 border-gray-500">
             <h3 class="text-lg font-semibold text-gray-700 mb-3 mt-4">Afiliasi Peneliti</h3>
           @if (empty($user->institusi)||empty($user->status_peneliti)||empty($user->asal_peneliti))
             <p class="text-sm text-red-600 bg-red-100 border border-red-300 p-3 rounded mb-4">
@@ -132,38 +129,84 @@
             </div>
           
             <div>
-                <label class="block text-sm font-medium text-gray-600">Status Peneliti</label>
-                <select name="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                    @if (!empty($user->status_peneliti))
-                        <option selected @readonly(true) class="text-gray-400 bg-gray-100" value="{{ $user->status_peneliti }}">
-                            {{ $user->status_peneliti }}    
-                        </option>     
-                    @else
-                        <option selected value="">-- Pilih --</option>
-                        <option value="Mahasiswa (S1)">Mahasiswa (S1)</option>
-                        <option value="Mahasiswa (S2)">Mahasiswa (S2)</option>
-                        <option value="Mahasiswa (S3)">Mahasiswa (S3)</option>
-                        <option value="Dosen">Dosen</option>
-                        <option value="Peneliti Umum">Peneliti Umum</option>
-                    @endif
-                </select>
-            </div>
+              <label class="block text-sm font-medium text-gray-600">Status Peneliti</label>
+              <select name="status" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                @if (!empty($user->status_peneliti))
+                  <option selected @readonly(true) class="text-gray-400 bg-gray-100" value="{{ $user->status_peneliti }}">
+                    {{ $user->status_peneliti }}    
+                  </option>     
+                @else
+                  <option selected value="">-- Pilih --</option>
+                  <option value="Mahasiswa (S1)">Mahasiswa (S1)</option>
+                  <option value="Mahasiswa (S2)">Mahasiswa (S2)</option>
+                  <option value="Mahasiswa (S3)">Mahasiswa (S3)</option>
+                  <option value="Dosen">Dosen</option>
+                  <option value="Peneliti Umum">Peneliti Umum</option>
+                @endif
+            </select>
+          </div>
           
+          <div>
+            <label class="block text-sm font-medium text-gray-600">Asal Peneliti</label>
+            <select name="asal" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                @if (!empty($user->asal_peneliti))
+                    <option selected @readonly(true) class="text-gray-400 bg-gray-100" value="{{ $user->asal_peneliti }}">{{ $user->asal_peneliti }}</option>
+                @else
+                    <option selected value="">-- Pilih --</option>
+                    <option value="UNUJA">UNUJA</option>
+                    <option value="Eksternal">Eksternal</option>
+                @endif
+            </select>
+          </div>
+        </div>
+      </div>
+
+        <!-- KTP Section -->
+        <div class="my-10 flex flex-col md:flex-row md:items-center md:space-x-8">
+          <div class="flex items-center space-x-4 mb-3 md:mb-0">
+            <div class="relative group">
+              <img
+                id="ktpPreview"
+                @if (!empty($user->ktp_path))
+                  src="{{ asset('private/' . $user->ktp_path) }}"
+                @else
+                  src="https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg"
+                @endif
+                alt="Foto KTP" class="w-36 h-24 object-cover rounded-lg border-2 border-blue-200 shadow-md transition group-hover:scale-105 group-hover:shadow-xl duration-200" />
+              <span class="absolute bottom-1 right-2 bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded opacity-80 group-hover:opacity-100 transition">Preview</span>
+            </div>
             <div>
-              <label class="block text-sm font-medium text-gray-600">Asal Peneliti</label>
-              <select name="asal" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                  @if (!empty($user->asal_peneliti))
-                      <option selected @readonly(true) class="text-gray-400 bg-gray-100" value="{{ $user->asal_peneliti }}">{{ $user->asal_peneliti }}</option>
-                  @else
-                      <option selected value="">-- Pilih --</option>
-                      <option value="UNUJA">UNUJA</option>
-                      <option value="Eksternal">Eksternal</option>
+              <p class="text-sm font-semibold text-gray-700 mb-1 flex items-center gap-1">Status Verifikasi KTP:
+                @if (!empty($user->ktp_verified_at))
+                  <span class="inline-flex items-center px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold ml-2"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>Sudah Diverifikasi</span>
+                @elseif (!empty($user->ktp_reject_reason))
+                  <span class="inline-flex items-center px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold ml-2"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>Ditolak Admin</span>
+                  @if (!empty($user->ktp_reject_reason))
+                    <div class="mt-2 text-xs text-red-700 bg-red-50 border border-red-200 rounded p-2 animate-pulse">
+                      <strong>Alasan Penolakan:</strong>
+                      <div>{{ $user->ktp_reject_reason }}</div>
+                    </div>
                   @endif
-              </select>
+                @else
+                  <span class="inline-flex items-center px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-semibold ml-2"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" /><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"></circle></svg>Belum Diverifikasi</span>
+                @endif
+              </p>
+              @if (!empty($user->ktp_verified_at))
+                <p class="text-xs text-gray-500">Diverifikasi pada: {{ $user->ktp_verified_at ? \Carbon\Carbon::parse($user->ktp_verified_at)->format('d M Y H:i') : '-' }}</p>
+              @else
+                <div class="mt-4">
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Ubah Foto KTP</label>
+                  <div class="flex items-center gap-2">
+                    <input type="file" name="ktp" accept="image/*,.pdf" id="ktpUpload"
+                      class="block text-xs border border-gray-300 rounded px-2 py-1 bg-gray-50 focus:ring-2 focus:ring-blue-400 focus:border-blue-500 transition" onchange="previewKtp(event)">
+                    <button type="button" onclick="resetKtpInput()" class="px-2 py-1 bg-gray-200 text-gray-600 rounded hover:bg-gray-300 text-xs">Reset</button>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, atau PDF. Maksimal 2MB.</p>
+                </div>
+              @endif
             </div>
           </div>
         </div>
-
 
         <!-- Tombol Simpan -->
         <div class="pt-4">
@@ -175,7 +218,7 @@
     </div>
 
     <!-- Form Ganti Password -->
-<div class="mx-3 mt-10 bg-white p-6 rounded-lg shadow-md pt-8">
+  <div class="mx-3 mt-10 bg-white p-6 rounded-lg shadow-md pt-8">
   <h3 class="text-lg font-semibold text-gray-700 mb-4 border-b border-gray-700 pb-2">Ganti Password</h3>
   
   <form action="{{ route('password.update') }}" method="POST" class="space-y-6">
@@ -206,7 +249,7 @@
       </button>
     </div>
   </form>
-</div>
+  </div>
 
 <!-- Modal Avatar -->
 <div id="modalAvatar" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center">
@@ -242,6 +285,7 @@
   </div>
 </div>
 
+
 <script>
   function tutupModalError() {
     document.getElementById('modalError').classList.add('hidden');
@@ -262,6 +306,24 @@
     const modal = document.getElementById('modalAvatar');
     modal.classList.remove('block', 'flex');
     modal.classList.add('hidden')
+  }
+
+  function previewKtp(event) {
+    const input = event.target;
+    const preview = document.getElementById('ktpPreview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+  function resetKtpInput() {
+    const input = document.getElementById('ktpUpload');
+    const preview = document.getElementById('ktpPreview');
+    input.value = '';
+    preview.src = "@if (!empty($user->ktp_path)){{ asset('private/' . $user->ktp_path) }}@else https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg @endif";
   }
 </script>
     
