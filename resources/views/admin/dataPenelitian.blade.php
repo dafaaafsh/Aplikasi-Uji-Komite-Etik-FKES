@@ -54,7 +54,7 @@
         </select>
       </div>
       <input type="text" id="searchInput" placeholder="Cari Judul / Peneliti / No. Protokol" 
-        class="border border-gray-300 rounded-md px-4 py-2 text-sm w-full md:w-1/3" />
+        class="border border-gray-300 rounded-md px-4 py-2 text-sm w-full md:w-1/3 focus:ring-2 focus:ring-blue-400 transition" autocomplete="off" />
     </div>
 
     <!-- Tabel Data Penelitian -->
@@ -74,7 +74,7 @@
         </thead>
         <tbody id="monitoringTable">
           @forelse($protocols as $index => $protokol)
-          <tr class="border-t hover:bg-gray-50">
+          <tr class="border-t hover:bg-gray-50 data-row" data-nomor="{{ strtolower($protokol->nomor_protokol_asli) }}" data-judul="{{ strtolower($protokol->judul) }}" data-peneliti="{{ strtolower($protokol->peneliti->name ?? '') }}">
             <td class="px-4 py-2">{{ $loop->iteration }}</td>
             <td class="px-4 py-2">{{ $protokol->nomor_protokol_asli }}</td>
             <td class="px-4 py-2">{{ Str::limit($protokol->judul, 40) }}</td>
@@ -275,6 +275,75 @@
 
 
     <script>
+        // Live search/filter table
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const tableRows = Array.from(document.querySelectorAll('#monitoringTable .data-row'));
+
+        function highlightText(text, term) {
+            if (!term) return text;
+            const regex = new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<span class="bg-yellow-200 text-black font-bold">$1</span>');
+        }
+
+        function filterTable() {
+            const search = searchInput.value.trim().toLowerCase();
+            const status = statusFilter.value;
+            let rowNumber = 1;
+            tableRows.forEach(row => {
+                const nomor = row.getAttribute('data-nomor');
+                const judul = row.getAttribute('data-judul');
+                const peneliti = row.getAttribute('data-peneliti');
+                const statusPenelitian = row.querySelector('td:nth-child(5) span').textContent.trim();
+                let match = true;
+                if (search) {
+                    match = nomor.includes(search) || judul.includes(search) || peneliti.includes(search);
+                }
+                if (status) {
+                    match = match && statusPenelitian === status;
+                }
+                if (match) {
+                    row.classList.remove('hidden');
+                    // Highlight
+                    row.querySelector('td:nth-child(2)').innerHTML = highlightText(row.querySelector('td:nth-child(2)').textContent, search);
+                    row.querySelector('td:nth-child(3)').innerHTML = highlightText(row.querySelector('td:nth-child(3)').textContent, search);
+                    row.querySelector('td:nth-child(4)').innerHTML = highlightText(row.querySelector('td:nth-child(4)').textContent, search);
+                    // Update row number
+                    row.querySelector('td:nth-child(1)').textContent = rowNumber++;
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+            // If no visible rows, show empty message
+            const visibleRows = tableRows.filter(row => !row.classList.contains('hidden'));
+            const emptyRow = document.querySelector('#monitoringTable .empty-row');
+            if (visibleRows.length === 0) {
+                if (!emptyRow) {
+                    const tr = document.createElement('tr');
+                    tr.className = 'empty-row';
+                    tr.innerHTML = `<td colspan="8" class="italic font-semibold px-4 py-4 text-center text-gray-500">Tidak ada data yang cocok.</td>`;
+                    document.getElementById('monitoringTable').appendChild(tr);
+                }
+            } else {
+                if (emptyRow) emptyRow.remove();
+            }
+        }
+
+        searchInput.addEventListener('input', filterTable);
+        statusFilter.addEventListener('change', filterTable);
+
+        // Remove highlight on blur
+        searchInput.addEventListener('blur', () => {
+            if (!searchInput.value) {
+                tableRows.forEach(row => {
+                    row.querySelector('td:nth-child(2)').innerHTML = row.querySelector('td:nth-child(2)').textContent;
+                    row.querySelector('td:nth-child(3)').innerHTML = row.querySelector('td:nth-child(3)').textContent;
+                    row.querySelector('td:nth-child(4)').innerHTML = row.querySelector('td:nth-child(4)').textContent;
+                });
+            }
+        });
+
+        // Modal detail logic (unchanged)
         function loadDetailData(id) {
             fetch(`/admin/dataPenelitian/detail/${id}`)
                 .then(res => res.json())

@@ -42,6 +42,10 @@
 </head>
 <body class="min-h-screen flex items-center justify-center">
 
+<a href="/" class="fixed top-4 left-4 z-30 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-xs sm:text-sm font-semibold shadow hover:bg-blue-200 transition flex items-center gap-2">
+  <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+  Halaman Utama
+</a>
 <div class="glass shadow-2xl rounded-2xl w-full max-w-sm p-4 sm:p-6 relative overflow-hidden border border-blue-100">
   <div class="flex flex-col items-center mb-2">
     <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Logo-UNUJA.png" alt="UNUJA" class="w-12 h-12 mb-1 drop-shadow-lg">
@@ -110,125 +114,45 @@
     <!-- STEP 1: Info Akun -->
     <div class="form-step" id="step-1">
       <label class="block text-sm mb-1 font-semibold text-blue-700">Email</label>
-      <input type="email" id="email" name="email" required class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-1 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50">
+      <input type="email" id="email" name="email" required placeholder="Masukkan email aktif Anda" class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-1 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50">
       <div id="emailError" class="text-xs text-red-600 mb-2 hidden"></div>
 
       <label class="block text-sm mb-1 font-semibold text-blue-700">Kata Sandi</label>
       <div class="relative">
-        <input type="password" id="password" name="password" minlength="6" required class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-1 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50 pr-10" oninput="checkPasswordStrength()">
+        <input type="password" id="password" name="password" minlength="8" required placeholder="Buat password minimal 8 karakter" class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-1 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50 pr-10" oninput="checkPasswordStrength()">
         <button type="button" tabindex="-1" onclick="togglePassword('password', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-700 focus:outline-none">
-          <svg id="icon-password" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+          <svg id="icon-password" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
         </button>
       </div>
-      <div class="text-xs text-gray-600 mb-1">Password minimal 6 karakter, mengandung huruf besar, angka, dan simbol untuk keamanan maksimal.</div>
+      <div class="text-xs text-gray-600 mb-1">Password minimal 8 karakter, mengandung huruf besar, angka, dan simbol untuk keamanan maksimal.</div>
       <div id="passwordStrength" class="text-xs mb-1"></div>
       <div id="passwordError" class="text-xs text-red-600 mb-2 hidden"></div>
 
       <label class="block text-sm mb-1 font-semibold text-blue-700">Konfirmasi Kata Sandi</label>
       <div class="relative">
-        <input type="password" id="password_confirmation" name="password_confirmation" minlength="6" required class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 text-sm bg-blue-50 pr-10" oninput="checkPasswordMatch()">
+        <input type="password" id="password_confirmation" name="password_confirmation" minlength="8" required placeholder="Ulangi password yang sama" class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 text-sm bg-blue-50 pr-10" oninput="checkPasswordMatch()">
         <button type="button" tabindex="-1" onclick="togglePassword('password_confirmation', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-700 focus:outline-none">
-          <svg id="icon-password_confirmation" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+          <svg id="icon-password_confirmation" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
         </button>
       </div>
       <div id="passwordConfirmError" class="text-xs text-red-600 mb-2 hidden"></div>
-<script>
-function togglePassword(fieldId, btn) {
-  const input = document.getElementById(fieldId);
-  const icon = btn.querySelector('svg');
-  if (input.type === 'password') {
-    input.type = 'text';
-    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.293-3.95m3.362-2.568A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.956 9.956 0 01-4.043 5.306M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />';
-  } else {
-    input.type = 'password';
-    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
-  }
-}
-</script>
 
       <div class="mt-5 flex justify-end">
         <button type="button" onclick="nextStep()" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white px-6 py-2 rounded-lg text-sm font-bold shadow hover:from-blue-700 hover:to-blue-500 transition">Next</button>
       </div>
-<script>
-// Password strength checker
-function checkPasswordStrength() {
-  const password = document.getElementById('password').value;
-  const strengthDiv = document.getElementById('passwordStrength');
-  let strength = 0;
-  if (password.length >= 6) strength++;
-  if (/[A-Z]/.test(password)) strength++;
-  if (/[0-9]/.test(password)) strength++;
-  if (/[^A-Za-z0-9]/.test(password)) strength++;
-  let status = '';
-  let color = '';
-  if (password.length === 0) {
-    status = '';
-  } else if (strength <= 1) {
-    status = 'Lemah';
-    color = 'text-red-600';
-  } else if (strength === 2 || strength === 3) {
-    status = 'Sedang';
-    color = 'text-yellow-600';
-  } else if (strength >= 4) {
-    status = 'Kuat';
-    color = 'text-green-600';
-  }
-  strengthDiv.textContent = status ? `Password: ${status}` : '';
-  strengthDiv.className = `text-xs mb-1 font-semibold ${color}`;
-}
 
-// Password match checker
-function checkPasswordMatch() {
-  const pass = document.getElementById('password').value;
-  const confirm = document.getElementById('password_confirmation').value;
-  const errorDiv = document.getElementById('passwordConfirmError');
-  if (confirm && pass !== confirm) {
-    errorDiv.textContent = 'Konfirmasi password tidak sama.';
-    errorDiv.classList.remove('hidden');
-  } else {
-    errorDiv.textContent = '';
-    errorDiv.classList.add('hidden');
-  }
-}
-
-// Real-time validation for email and password
-document.getElementById('email').addEventListener('input', function() {
-  const email = this.value;
-  const errorDiv = document.getElementById('emailError');
-  if (email && !/^\S+@\S+\.\S+$/.test(email)) {
-    errorDiv.textContent = 'Format email tidak valid.';
-    errorDiv.classList.remove('hidden');
-  } else {
-    errorDiv.textContent = '';
-    errorDiv.classList.add('hidden');
-  }
-});
-
-document.getElementById('password').addEventListener('input', function() {
-  const errorDiv = document.getElementById('passwordError');
-  if (this.value.length > 0 && this.value.length < 6) {
-    errorDiv.textContent = 'Password minimal 6 karakter.';
-    errorDiv.classList.remove('hidden');
-  } else {
-    errorDiv.textContent = '';
-    errorDiv.classList.add('hidden');
-  }
-});
-
-document.getElementById('password_confirmation').addEventListener('input', checkPasswordMatch);
-</script>
     </div>
 
     <!-- STEP 2: Info Diri -->
     <div class="form-step hidden" id="step-2">
       <label class="block text-sm mb-1 font-semibold text-blue-700">Nama Lengkap</label>
-      <input type="text" id="name" name="name" required class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-2 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50">
+      <input type="text" id="name" name="name" required placeholder="Nama lengkap sesuai KTP" class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-2 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50">
 
       <label class="block text-sm mb-1 font-semibold text-blue-700">No HP</label>
-      <input type="tel" id="nohp" name="nohp" required pattern="[0-9]{10,15}" class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-2 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50" placeholder="08xxxxxxxxxx">
+      <input type="tel" id="nohp" name="nohp" required pattern="[0-9]{10,15}" placeholder="08xxxxxxxxxx" class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-2 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50">
 
       <label class="block text-sm mb-1 font-semibold text-blue-700">Alamat</label>
-      <textarea id="alamat" name="alamat" required class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50" rows="2"></textarea>
+      <textarea id="alamat" name="alamat" required placeholder="Alamat domisili lengkap" class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50" rows="2"></textarea>
 
       <div class="mt-5 flex justify-between">
         <button type="button" onclick="prevStep()" class="bg-gray-400 text-white px-6 py-2 rounded-lg text-sm font-bold shadow hover:bg-gray-500 transition">Previous</button>
@@ -256,7 +180,7 @@ document.getElementById('password_confirmation').addEventListener('input', check
       </select>
 
       <label class="block text-sm mb-1 font-semibold text-blue-700">Institusi</label>
-      <input type="text" id="institusi" name="institusi" required class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50">
+      <input type="text" id="institusi" name="institusi" required placeholder="Nama institusi/instansi" class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50">
 
       <div class="mt-5 flex justify-between">
         <button type="button" onclick="prevStep()" class="bg-gray-400 text-white px-6 py-2 rounded-lg text-sm font-bold shadow hover:bg-gray-500 transition">Previous</button>
@@ -267,13 +191,22 @@ document.getElementById('password_confirmation').addEventListener('input', check
     <!-- STEP 4: Upload KTP -->
     <div class="form-step hidden" id="step-4">
       <p class="mb-1 text-sm font-semibold text-blue-700">Upload KTP</p>
-      <input type="file" id="ktp" name="ktp" accept="image/*,.pdf" required class="mb-2 text-xs bg-blue-50 border-2 border-blue-100 rounded-lg px-2 py-1">
-      <div id="ktpLoading" class="hidden flex items-center gap-2 mb-2">
-        <span class="inline-block w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></span>
-        <span class="text-xs text-blue-500">Memproses gambar...</span>
+      <label for="ktp" class="block cursor-pointer mb-2">
+        <div class="flex items-center justify-center border-2 border-dashed border-blue-300 rounded-lg bg-blue-50 py-2 px-2 hover:bg-blue-100 transition min-h-[56px]">
+          <svg class="w-6 h-6 text-blue-400 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span class="text-blue-600 font-semibold text-sm">Klik untuk pilih file KTP (jpg/png/pdf)</span>
+        </div>
+        <input type="file" id="ktp" name="ktp" accept="image/*,.pdf" required class="hidden" placeholder="Upload file KTP (jpg/png/pdf)">
+      </label>
+      <div id="ktpFileName" class="text-xs text-blue-700 mb-2"></div>
+      <div id="ktpLoading" class="hidden flex flex-col items-center gap-2 mb-2">
+        <span class="inline-block w-9 h-9 border-2 border-blue-400 border-t-transparent rounded-full animate-spin"></span>
+        <span class="text-xs text-blue-500 font-semibold">Memproses gambar, mohon tunggu...</span>
       </div>
-
-      <p class="text-xs text-blue-500 mb-4">Data yang Anda upload akan <strong>aman</strong> dan dilindungi.</p>
+      <div id="ktpPreviewContainer" class="mb-2"></div>
+      <p class="text-xs text-blue-500 mb-4">Data yang Anda upload akan <strong>aman</strong> dan dilindungi. Preview gambar akan muncul setelah proses selesai.</p>
 
       <div class="flex justify-between mt-4">
         <button type="button" onclick="prevStep()" class="bg-gray-400 text-white px-6 py-2 rounded-lg text-sm font-bold shadow hover:bg-gray-500 transition">Previous</button>
@@ -312,10 +245,12 @@ document.getElementById('password_confirmation').addEventListener('input', check
       </div>
     </div>
   </form>
-  <p class="mt-2 text-center text-xs sm:text-sm text-gray-500">
-    Sudah punya akun?
-    <a href="/login" class="font-semibold text-blue-600 hover:text-blue-500">Masuk di sini</a>
-  </p>
+  <div class="mt-2 flex flex-col items-center gap-1">
+    <p class="text-center text-xs sm:text-sm text-gray-500">
+      Sudah punya akun?
+      <a href="/login" class="font-semibold text-blue-600 hover:text-blue-500">Masuk di sini</a>
+    </p>
+  </div>
 </div>
 
 <script>
@@ -459,36 +394,113 @@ function prevStep() {
 }
 
 // Preview KTP dengan animasi fade-in
-document.getElementById('ktp').addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  const loading = document.getElementById('ktpLoading');
-  let preview = document.getElementById('ktpPreview');
-  if (preview) preview.remove(); // Hapus preview lama jika ada
 
-  if (file && file.type.startsWith('image/')) {
-    loading.classList.remove('hidden');
-    const reader = new FileReader();
-    reader.onload = function(ev) {
-      loading.classList.add('hidden');
-      let preview = document.getElementById('ktpPreview');
-      if (!preview) {
-        preview = document.createElement('img');
-        preview.id = 'ktpPreview';
-        preview.className = 'mb-2 rounded shadow max-h-32 fade-in';
-        e.target.parentNode.insertBefore(preview, loading.nextSibling);
-      }
-      preview.src = ev.target.result;
-      preview.classList.remove('fade-in');
-      void preview.offsetWidth;
-      preview.classList.add('fade-in');
-    };
-    reader.readAsDataURL(file);
-  } else {
-    if (loading) loading.classList.add('hidden');
-  }
+const ktpInput = document.getElementById('ktp');
+const ktpFileName = document.getElementById('ktpFileName');
+const ktpLoading = document.getElementById('ktpLoading');
+const ktpPreviewContainer = document.getElementById('ktpPreviewContainer');
+
+ktpInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  ktpFileName.textContent = file ? `File terpilih: ${file.name}` : '';
+  ktpPreviewContainer.innerHTML = '';
+  if (!file) return;
+  ktpLoading.classList.remove('hidden');
+  // Simulasi loading lebih lama (2.5 detik)
+  setTimeout(() => {
+    ktpLoading.classList.add('hidden');
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        ktpPreviewContainer.innerHTML = `<img src="${ev.target.result}" alt="Preview KTP" class="mb-2 rounded shadow max-h-40 fade-in">`;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      ktpPreviewContainer.innerHTML = `<span class="text-xs text-gray-500">File bukan gambar, preview tidak tersedia.</span>`;
+    }
+  }, 5000);
 });
 
 showStep(currentStep);
+
+function togglePassword(fieldId, btn) {
+  const input = document.getElementById(fieldId);
+  const icon = btn.querySelector('svg');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.293-3.95m3.362-2.568A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.956 9.956 0 01-4.043 5.306M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />';
+  } else {
+    input.type = 'password';
+    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+  }
+}
+
+// Password strength checker
+function checkPasswordStrength() {
+  const password = document.getElementById('password').value;
+  const strengthDiv = document.getElementById('passwordStrength');
+  let strength = 0;
+  if (password.length >= 8) strength++;
+  if (/[A-Z]/.test(password)) strength++;
+  if (/[0-9]/.test(password)) strength++;
+  if (/[^A-Za-z0-9]/.test(password)) strength++;
+  let status = '';
+  let color = '';
+  if (password.length === 0) {
+    status = '';
+  } else if (strength <= 1) {
+    status = 'Lemah';
+    color = 'text-red-600';
+  } else if (strength === 2 || strength === 3) {
+    status = 'Sedang';
+    color = 'text-yellow-600';
+  } else if (strength >= 4) {
+    status = 'Kuat';
+    color = 'text-green-600';
+  }
+  strengthDiv.textContent = status ? `Password: ${status}` : '';
+  strengthDiv.className = `text-xs mb-1 font-semibold ${color}`;
+}
+
+// Password match checker
+function checkPasswordMatch() {
+  const pass = document.getElementById('password').value;
+  const confirm = document.getElementById('password_confirmation').value;
+  const errorDiv = document.getElementById('passwordConfirmError');
+  if (confirm && pass !== confirm) {
+    errorDiv.textContent = 'Konfirmasi password tidak sama.';
+    errorDiv.classList.remove('hidden');
+  } else {
+    errorDiv.textContent = '';
+    errorDiv.classList.add('hidden');
+  }
+}
+
+// Real-time validation for email and password
+document.getElementById('email').addEventListener('input', function() {
+  const email = this.value;
+  const errorDiv = document.getElementById('emailError');
+  if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+    errorDiv.textContent = 'Format email tidak valid.';
+    errorDiv.classList.remove('hidden');
+  } else {
+    errorDiv.textContent = '';
+    errorDiv.classList.add('hidden');
+  }
+});
+
+document.getElementById('password').addEventListener('input', function() {
+  const errorDiv = document.getElementById('passwordError');
+  if (this.value.length > 0 && this.value.length < 8) {
+    errorDiv.textContent = 'Password minimal 8 karakter.';
+    errorDiv.classList.remove('hidden');
+  } else {
+    errorDiv.textContent = '';
+    errorDiv.classList.add('hidden');
+  }
+});
+
+document.getElementById('password_confirmation').addEventListener('input', checkPasswordMatch);
 </script>
 
 </body>

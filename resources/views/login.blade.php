@@ -25,6 +25,11 @@
   </style>
 </head>
 <body class="min-h-screen flex items-center justify-center">
+
+<a href="/" class="fixed top-4 left-4 z-30 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-xs sm:text-sm font-semibold shadow hover:bg-blue-200 transition flex items-center gap-2">
+  <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+  Halaman Utama
+</a>
   <div class="glass shadow-2xl rounded-2xl w-full max-w-md p-6 relative overflow-hidden border border-blue-100">
     <!-- Konten form dan lainnya -->
     <div class="flex flex-col items-center mb-4">
@@ -58,20 +63,28 @@
         </div>
       </div>
     @endif
+      @if (session('status'))
+        <div class="mb-4 flex items-start gap-2 px-4 py-2 bg-blue-50 border border-blue-400 rounded-lg text-blue-700 text-sm shadow-sm">
+          <svg class="w-5 h-5 mt-0.5 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M12 5.5a7 7 0 1 1 0 13.999A7 7 0 0 1 12 5.5z"/>
+          </svg>
+          <div>{{ session('status') }}</div>
+        </div>
+      @endif
 
     <form class="space-y-6" action="" method="POST">
       @csrf
       <div>
         <label for="email" class="block text-sm font-semibold text-blue-700">Alamat Email</label>
         <div class="mt-2">
-          <input type="email" name="email" id="email" value="{{ old('email') }}"
+          <input type="email" name="email" id="email" value="{{ old('email') }}" placeholder="Masukkan email Anda"
             class="block w-full bg-blue-50 rounded-lg border-2 border-blue-100 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-400">
         </div>
       </div>
       <div>
         <label for="password" class="block text-sm font-semibold text-blue-700">Password</label>
         <div class="mt-2 relative">
-          <input type="password" name="password" id="password"
+          <input type="password" name="password" id="password" placeholder="Masukkan password Anda"
             class="block w-full bg-blue-50 rounded-lg border-2 border-blue-100 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 shadow-sm focus:border-blue-400 focus:ring-2 focus:ring-blue-400 pr-10">
           <button type="button" tabindex="-1" onclick="togglePassword('password', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-700 focus:outline-none">
             <svg id="icon-password" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>

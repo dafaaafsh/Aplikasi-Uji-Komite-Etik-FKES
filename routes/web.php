@@ -24,6 +24,14 @@ route::middleware('guest')->group(function(){
     Route::post('/login', [SesiController::class, 'login']);
     Route::get('/signin', [HomeController::class, 'signin'])->name('signin');
     Route::post('/signin', [SesiController::class, 'store'])->name('siginStore');
+
+    Route::get('/forgot-password', [PasswordController::class, 'showForgotForm'])->name('password.request');
+
+    Route::post('/forgot-password', [PasswordController::class, 'sendResetLink'])->name('password.email');
+
+    Route::get('/reset-password/{token}', [PasswordController::class, 'showResetForm'])->name('password.reset');
+
+    Route::post('/reset-password', [PasswordController::class, 'resetPassword'])->name('password.reset.update');
 });
 
 

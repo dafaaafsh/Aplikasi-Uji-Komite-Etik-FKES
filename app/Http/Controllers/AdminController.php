@@ -566,7 +566,6 @@ class AdminController extends Controller
             'jenis_pengajuan' => $protocol->jenis_pengajuan ?? '-',
             'biaya' => $protocol->biaya_penelitian ?? '-',
             'kategori' => $protocol->kategori_review ?? '-',
-            'nomor_protokol' => $protocol->nomor_protokol,
             'institusi' => $peneliti->institusi ?? '-',
             'tanggal_pengajuan' => $tanggalFormatted,
             'status_telaah' => $protocol->status_telaah,

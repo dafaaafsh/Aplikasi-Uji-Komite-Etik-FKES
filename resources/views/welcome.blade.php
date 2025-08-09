@@ -38,7 +38,7 @@
         <header class="absolute inset-x-0 top-0 z-50">
           <nav id='nav' class="flex fixed w-full items-center transition-all duration-200 justify-between p-6 md:px-8" aria-label="Global">
             <div class="flex lg:flex-1">
-              <a href="#" class="-m-1.5 p-1.5">
+              <a href="https://www.unuja.ac.id/" class="-m-1.5 p-1.5">
                 <img class="h-15 w-auto" src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Logo-UNUJA.png" alt="">
               </a>
             </div>
@@ -50,9 +50,9 @@
               </button>
             </div>
             <div id="link" class="hidden text-md justify-center lg:flex lg:gap-x-12 w-100 text-gray-900">
-              <a href="#penelitian" class=" font-semibold hover:text-blue-500">Penelitian</a>
-              <a href="#alurLayanan" class=" font-semibold hover:text-blue-500">Alur Layanan</a>
-              <a href="#kontak" class=" font-semibold hover:text-blue-500">Kontak</a>
+              <a href="#penelitian" class="font-semibold hover:text-blue-500 nav-link transition-all duration-200">Penelitian</a>
+              <a href="#alurLayanan" class="font-semibold hover:text-blue-500 nav-link transition-all duration-200">Alur Layanan</a>
+              <a href="#kontak" class="font-semibold hover:text-blue-500 nav-link transition-all duration-200">Kontak</a>
             </div>
             <div id="signin" class="hidden lg:flex lg:flex-1 lg:justify-end text-gray-900">
               <a href="signin" class="text-lg font-bold hover:text-blue-500">
@@ -323,6 +323,54 @@
         </div>
       </div>
       <script>
+      // Interaktif animasi klik pada navbar
+      document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.nav-link').forEach(function(link) {
+          link.addEventListener('click', function(e) {
+            // animasi ripple sederhana
+            const ripple = document.createElement('span');
+            ripple.className = 'nav-ripple';
+            ripple.style.left = (e.offsetX || 0) + 'px';
+            ripple.style.top = (e.offsetY || 0) + 'px';
+            this.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 500);
+
+            // scroll smooth ke target
+            const href = this.getAttribute('href');
+            if (href && href.startsWith('#')) {
+              const target = document.querySelector(href);
+              if (target) {
+                e.preventDefault();
+                const yOffset = -80; // offset untuk navbar fixed
+                const y = target.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+              }
+            }
+          });
+        });
+      });
+      // CSS untuk ripple effect
+      if (!document.querySelector('style[data-nav-ripple]')) {
+        const style = document.createElement('style');
+        style.dataset.navRipple = '1';
+        style.innerHTML = `
+        .nav-link { position: relative; overflow: hidden; }
+        .nav-ripple {
+          position: absolute;
+          width: 40px; height: 40px;
+          background: rgba(59,130,246,0.25);
+          border-radius: 50%;
+          transform: translate(-50%,-50%) scale(0);
+          animation: nav-ripple-anim .5s cubic-bezier(.4,0,.2,1);
+          pointer-events: none;
+          z-index: 10;
+        }
+        @keyframes nav-ripple-anim {
+          to { transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
+        }
+        `;
+        document.head.appendChild(style);
+      }
         window.addEventListener('scroll', function () {
           const navbar = document.getElementById('nav');
           const link =document.getElementById('link');
