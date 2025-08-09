@@ -375,7 +375,7 @@
                     document.getElementById('d_institusi').textContent = data.institusi ?? '-';
                     document.getElementById('d_hp').textContent = data.hp ?? '-';
                     document.getElementById('d_status').textContent = data.status ?? '-';
-                
+
                     document.getElementById('d_nomor_protokol').textContent = data.nomor_protokol_asli ?? '-';
                     document.getElementById('d_judul').textContent = data.judul ?? '-';
                     document.getElementById('d_subjek').textContent = data.subjek ?? '-';
@@ -383,28 +383,56 @@
                     document.getElementById('d_jenis_pengajuan').textContent = data.jenis_pengajuan ?? '-';
                     document.getElementById('d_biaya').textContent = data.biaya ?? '-';
                     document.getElementById('d_tanggal').textContent = data.tanggal_pengajuan ?? '-';
-                
-                    const dokumenFields = [
-                        'surat_permohonan',
-                        'surat_institusi',
-                        'protokol_etik',
-                        'informed_consent',
-                        'proposal_penelitian',
-                        'sertifikat_gcp',
-                        'cv'
-                    ];
-                
-                    dokumenFields.forEach(key => {
-                        const link = document.getElementById('link-' + key);
-                        if (data[key]) {
-                            link.href = data[key];
-                            link.classList.remove('hidden');
-                        } else {
-                            link.href = '#';
-                            link.classList.add('hidden');
+
+                    // Tampilkan hanya link Google Drive jika ada, jika tidak tampilkan struktur file seperti biasa
+                    let gdrive_link = data.gdrive_link;
+                    let gdriveRow = document.getElementById('gdrive-link-row');
+                    let gdriveAnchor = document.getElementById('gdrive-link-anchor');
+                    if (!gdriveRow) {
+                        // Tambahkan baris Google Drive link secara dinamis jika belum ada
+                        const docContainer = document.querySelector('.mt-8 .space-y-3');
+                        if (docContainer) {
+                            gdriveRow = document.createElement('div');
+                            gdriveRow.id = 'gdrive-link-row';
+                            gdriveRow.className = 'flex items-center justify-between border border-gray-200 rounded-lg px-4 py-2 bg-green-50';
+                            gdriveAnchor = document.createElement('a');
+                            gdriveAnchor.id = 'gdrive-link-anchor';
+                            gdriveAnchor.target = '_blank';
+                            gdriveAnchor.className = 'text-green-700 font-semibold break-all';
+                            gdriveRow.innerHTML = '<span class="font-medium text-gray-800">Google Drive Link</span>';
+                            gdriveRow.appendChild(gdriveAnchor);
+                            docContainer.prepend(gdriveRow);
                         }
-                    });
-                
+                    }
+                    if (gdriveRow && gdriveAnchor) {
+                        if (gdrive_link) {
+                            gdriveAnchor.href = gdrive_link;
+                            gdriveAnchor.textContent = gdrive_link;
+                            gdriveRow.classList.remove('hidden');
+                            // Sembunyikan semua baris file PDF
+                            ['surat_permohonan', 'surat_institusi', 'protokol_etik', 'informed_consent', 'proposal_penelitian', 'sertifikat_gcp', 'cv'].forEach(field => {
+                                const linkElem = document.getElementById(`link-${field}`);
+                                if (linkElem) linkElem.parentElement.classList.add('hidden');
+                            });
+                        } else {
+                            if (gdriveRow) gdriveRow.classList.add('hidden');
+                            // Tampilkan file-file PDF yang tersedia (struktur tidak berubah)
+                            ['surat_permohonan', 'surat_institusi', 'protokol_etik', 'informed_consent', 'proposal_penelitian', 'sertifikat_gcp', 'cv'].forEach(field => {
+                                const linkElem = document.getElementById(`link-${field}`);
+                                if (linkElem) {
+                                    if (data[field]) {
+                                        linkElem.href = data[field];
+                                        linkElem.classList.remove('hidden');
+                                        linkElem.parentElement.classList.remove('hidden');
+                                    } else {
+                                        linkElem.classList.add('hidden');
+                                        linkElem.parentElement.classList.add('hidden');
+                                    }
+                                }
+                            });
+                        }
+                    }
+
                     const modal = document.getElementById('modalDetailPengajuan');
                     modal.classList.remove('hidden');
                     modal.classList.add('flex');

@@ -208,10 +208,33 @@ class KepkController extends Controller{
         $protocol = protocols::with('peneliti', 'documents')->findOrFail($id);
         $peneliti = $protocol->peneliti;
 
-        $getFile = function ($jenis) use ($protocol) {
-            $doc = $protocol->documents->firstWhere('tipe_file', $jenis);
-            return $doc ? asset('private/protokol/'.$protocol->nomor_protokol."/". $doc->nama_file) : null;
-        };
+        $dokumenList = [
+            'surat_permohonan',
+            'surat_institusi',
+            'protokol_etik',
+            'informed_consent',
+            'proposal_penelitian',
+            'sertifikat_gcp',
+            'cv'
+        ];
+
+        $detailDokumen = [];
+        foreach ($dokumenList as $tipe) {
+            $doc = $protocol->documents->firstWhere('tipe_file', $tipe);
+            if ($doc) {
+                if (!empty($doc->gdrive_link)) {
+                    $detailDokumen[$tipe] = [
+                        'mode' => 'link',
+                        'url' => $doc->gdrive_link
+                    ];
+                } elseif (!empty($doc->nama_file)) {
+                    $detailDokumen[$tipe] = [
+                        'mode' => 'file',
+                        'url' => asset('private/protokol/'.$protocol->nomor_protokol.'/'.$doc->nama_file)
+                    ];
+                }
+            }
+        }
 
         return response()->json([
             'nomor_protokol'     => $protocol->nomor_protokol_asli,
@@ -230,13 +253,7 @@ class KepkController extends Controller{
             'hp'        => $peneliti->nomor_hp ?? '-',
             'status'    => $peneliti->status_peneliti ?? '-',
 
-            'surat_permohonan' => $getFile('surat_permohonan'),
-            'surat_institusi' => $getFile('surat_institusi'),
-            'protokol_etik' => $getFile('protokol_etik'),
-            'informed_consent' => $getFile('informed_consent'),
-            'proposal_penelitian' => $getFile('proposal_penelitian'),
-            'sertifikat_gcp' => $getFile('sertifikat_gcp'),
-            'cv' => $getFile('cv'),
+            'detailDokumen' => $detailDokumen,
         ]);
     }
 

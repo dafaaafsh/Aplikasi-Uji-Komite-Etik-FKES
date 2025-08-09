@@ -43,7 +43,9 @@ Route::middleware(['auth', RoleMiddleware::class . ':Peneliti'])->group(function
         Route::get('/peneliti/pengajuanPenelitian', [PenelitiController::class, 'pengajuan'])->name('peneliti.pengajuan');
         Route::post('/peneliti/pengajuanPenelitian/storeDocument', [PenelitiController::class, 'storeDocument'])->name('pengajuan.store');
         Route::post('/peneliti/pengajuanPenelitian/updateDocument', [PenelitiController::class, 'updateDocument'])->name('update.store');
+        Route::post('/peneliti/pengajuanPenelitian/updateGDriveLink', [PenelitiController::class, 'updateGDriveLink'])->name('peneliti.pengajuan.updateGDriveLink');
         Route::get('/peneliti/template', [HomeController::class,'template'])->name('template');
+        Route::get('/peneliti/penelitian/gdrive-link/{id}', [PenelitiController::class, 'getGDriveLink'])->name('peneliti.penelitian.gdrive-link');
     });
     
     Route::get('/Peneliti/profil', [PenelitiController::class, 'profil'])->name('peneliti.profil');
@@ -74,7 +76,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':Admin'])->group(function ()
         Route::put('/admin/pengajuanPenelitian/kembalikan', [ AdminController::class, 'kembalikan'])->name('admin.kembalikan');
         Route::put('/admin/pengajuanPenelitian/lanjutkan', [ AdminController::class, 'lanjutkan'])->name('admin.lanjutkan');
         Route::get('/admin/dataPenelitian', [AdminController::class, 'dataPenelitian'])->name('admin.dataPenelitian');
-        Route::get('/admin/detailPenelitian/${id}', [AdminController::class, 'getDataPenelitian'])->name('admin.detailDataPenelitian');
+        Route::get('/admin/dataPenelitian/detail/{id}', [AdminController::class, 'getDataPenelitian'])->name('admin.detailDataPenelitian');
         Route::post('/admin/suratLulus/upload/{id}', [AdminController::class, 'uploadSuratLulus'])->name('admin.uploadSuratLulus');
         Route::get('/admin/suratLulus', [AdminController::class, 'suratLulus'])->name('admin.suratLulus');
         Route::get('/admin/protokol/{id}/data',[AdminController::class, 'getDataProtokol'])->name('admin.protokol.data');
@@ -90,7 +92,6 @@ Route::middleware(['auth', RoleMiddleware::class . ':Admin'])->group(function ()
 Route::middleware(['auth', RoleMiddleware::class . ':Kepk'])->group(function () {
     Route::get('/kepk/dashboard', [KepkController::class, 'dashboard'])->name('kepk.dashboard');
     Route::get('/kepk/dataPenelitian', [KepkController::class, 'dataPenelitian'])->name('kepk.dataPenelitian');
-    Route::get('/kepk/dataPenelitian/{id}', [KepkController::class, 'getDetailData'])->name('kepk.detailData');
 
     Route::middleware(['verified'])->group(function () {
         Route::get('/kepk/telaahAwal', [KepkController::class, 'telaahAwal'])->name('kepk.telaahAwal');
@@ -98,7 +99,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':Kepk'])->group(function () 
         Route::put('/admin/pengajuanPenelitian/expedited', [ KepkController::class, 'expedited'])->name('kepk.expedited');
         Route::put('/admin/pengajuanPenelitian/fullboard', [ KepkController::class, 'fullboard'])->name('kepk.fullboard');
         Route::get('/kepk/telaahAkhir', [KepkController::class, 'telaahAkhir'])->name('kepk.telaahAkhir');
-        Route::get('/kepk/telaahAkhir/{id}', [KepkController::class, 'getDetailData'])->name('kepk.detailAkhir');
+        Route::get('/kepk/telaahAkhir/{id}', [AdminController::class, 'getDetailPengajuan'])->name('kepk.detailAkhir');
         Route::get('/kepk/telaahAkhir/review/{id}', [KepkController::class, 'getDetailReview'])->name('kepk.detailReview');
         Route::post('/kepk/telaahAkhir/keputusan', [KeputusanController::class, 'store'])->name('kepk.keputusan.store');
     });
@@ -113,7 +114,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':Penguji'])->group(function 
     Route::get('/penguji/dashboard', [PengujiController::class, 'dashboard'])->name('penguji.dashboard');
     Route::get('/protokol/{id}', [PengujiController::class, 'show'])->name('penguji.protokol.show');
     Route::get('/penguji/dataPenelitian', [PengujiController::class, 'dataPenelitian'])->name('penguji.dataPenelitian');
-    Route::get('/penguji/dataPenelitian/{id}', [PengujiController::class, 'getDetailData'])->name('penguji.detailData');
+    Route::get('/penguji/dataPenelitian/{id}', [AdminController::class, 'getDetailPengajuan'])->name('penguji.detailData');
 
     Route::middleware(['verified'])->group(function () {
         Route::get('/penguji/telaahPenelitian', [PengujiController::class, 'telaahPenelitian'])->name('penguji.telaahPenelitian');

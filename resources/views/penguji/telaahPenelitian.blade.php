@@ -106,7 +106,7 @@
                             <div class="flex gap-2 justify-center">
                                 <button onclick="openModalReview({{ $item->id }})"
                                     class="px-3 py-1 text-sm bg-orange-600 hover:bg-orange-700 text-white rounded">
-                                    Beri Review
+                                    Review
                                 </button>                            
                             </div>
                         </td>
@@ -133,12 +133,12 @@
     </div>
 
     <div id="modalDetailPengajuan" class="fixed inset-0 z-50 hidden flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto">
-        <div class="flex items-start justify-center w-screen min-h-screen px-4 py-8">
+        <div class="flex items-start justify-center min-h-screen px-4 py-8">
           <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl p-8 relative border border-gray-300">
 
             <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
       
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Detail Pengajuan Penelitian</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Detail Protokol Penelitian</h2>
       
             <!-- Info Peneliti -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
@@ -293,55 +293,83 @@
 
     <script>
       function loadDetailData(id) {
-          fetch(`/penguji/dataPenelitian/${id}`)
-              .then(res => res.json())
-              .then(data => {
-                  document.getElementById('d_nama').textContent = data.nama ?? '-';
-                  document.getElementById('d_email').textContent = data.email ?? '-';
-                  document.getElementById('d_asal').textContent = data.asal ?? '-';
-                  document.getElementById('d_institusi').textContent = data.institusi ?? '-';
-                  document.getElementById('d_hp').textContent = data.hp ?? '-';
-                  document.getElementById('d_status').textContent = data.status ?? '-';
-              
-                  document.getElementById('d_nomor_protokol').textContent = data.nomor_protokol ?? '-';
-                  document.getElementById('d_judul').textContent = data.judul ?? '-';
-                  document.getElementById('d_subjek').textContent = data.subjek ?? '-';
-                  document.getElementById('d_jenis_penelitian').textContent = data.jenis_penelitian ?? '-';
-                  document.getElementById('d_jenis_pengajuan').textContent = data.jenis_pengajuan ?? '-';
-                  document.getElementById('d_biaya').textContent = data.biaya ?? '-';
-                  document.getElementById('d_tanggal').textContent = data.tanggal_pengajuan ?? '-';
-                  document.getElementById('d_kategori').textContent = data.kategori ?? '-';
-              
-                  const dokumenFields = [
-                      'surat_permohonan',
-                      'surat_institusi',
-                      'protokol_etik',
-                      'informed_consent',
-                      'proposal_penelitian',
-                      'sertifikat_gcp',
-                      'cv'
-                  ];
-              
-                  dokumenFields.forEach(key => {
-                      const link = document.getElementById('link-' + key);
-                      if (data[key]) {
-                          link.href = data[key];
-                          link.classList.remove('hidden');
-                      } else {
-                          link.href = '#';
-                          link.classList.add('hidden');
-                      }
-                  });
-              
-                  const modal = document.getElementById('modalDetailPengajuan');
-                  modal.classList.remove('hidden');
-                  modal.classList.add('flex');
-              })
-              .catch(err => {
-                  alert('Gagal memuat data detail.');
-                  console.error(err);
-              });
-      }
+            fetch(`/penguji/dataPenelitian/${id}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('d_nama').textContent = data.nama ?? '-';
+                    document.getElementById('d_email').textContent = data.email ?? '-';
+                    document.getElementById('d_asal').textContent = data.asal ?? '-';
+                    document.getElementById('d_institusi').textContent = data.institusi ?? '-';
+                    document.getElementById('d_hp').textContent = data.hp ?? '-';
+                    document.getElementById('d_status').textContent = data.status ?? '-';
+
+                    document.getElementById('d_nomor_protokol').textContent = data.nomor_protokol_asli ?? '-';
+                    document.getElementById('d_judul').textContent = data.judul ?? '-';
+                    document.getElementById('d_subjek').textContent = data.subjek ?? '-';
+                    document.getElementById('d_jenis_penelitian').textContent = data.jenis_penelitian ?? '-';
+                    document.getElementById('d_jenis_pengajuan').textContent = data.jenis_pengajuan ?? '-';
+                    document.getElementById('d_biaya').textContent = data.biaya ?? '-';
+                    document.getElementById('d_tanggal').textContent = data.tanggal_pengajuan ?? '-';
+                    document.getElementById('d_kategori').textContent = data.kategori ?? '-';
+
+                    // Tampilkan hanya link Google Drive jika ada, jika tidak tampilkan struktur file seperti biasa
+                    let gdrive_link = data.gdrive_link;
+                    let gdriveRow = document.getElementById('gdrive-link-row');
+                    let gdriveAnchor = document.getElementById('gdrive-link-anchor');
+                    if (!gdriveRow) {
+                        // Tambahkan baris Google Drive link secara dinamis jika belum ada
+                        const docContainer = document.querySelector('.mt-8 .space-y-3');
+                        if (docContainer) {
+                            gdriveRow = document.createElement('div');
+                            gdriveRow.id = 'gdrive-link-row';
+                            gdriveRow.className = 'flex items-center justify-between border border-gray-200 rounded-lg px-4 py-2 bg-green-50';
+                            gdriveAnchor = document.createElement('a');
+                            gdriveAnchor.id = 'gdrive-link-anchor';
+                            gdriveAnchor.target = '_blank';
+                            gdriveAnchor.className = 'text-green-700 font-semibold break-all';
+                            gdriveRow.innerHTML = '<span class="font-medium text-gray-800">Google Drive Link</span>';
+                            gdriveRow.appendChild(gdriveAnchor);
+                            docContainer.prepend(gdriveRow);
+                        }
+                    }
+                    if (gdriveRow && gdriveAnchor) {
+                        if (gdrive_link) {
+                            gdriveAnchor.href = gdrive_link;
+                            gdriveAnchor.textContent = gdrive_link;
+                            gdriveRow.classList.remove('hidden');
+                            // Sembunyikan semua baris file PDF
+                            ['surat_permohonan', 'surat_institusi', 'protokol_etik', 'informed_consent', 'proposal_penelitian', 'sertifikat_gcp', 'cv'].forEach(field => {
+                                const linkElem = document.getElementById(`link-${field}`);
+                                if (linkElem) linkElem.parentElement.classList.add('hidden');
+                            });
+                        } else {
+                            if (gdriveRow) gdriveRow.classList.add('hidden');
+                            // Tampilkan file-file PDF yang tersedia (struktur tidak berubah)
+                            ['surat_permohonan', 'surat_institusi', 'protokol_etik', 'informed_consent', 'proposal_penelitian', 'sertifikat_gcp', 'cv'].forEach(field => {
+                                const linkElem = document.getElementById(`link-${field}`);
+                                if (linkElem) {
+                                    if (data[field]) {
+                                        linkElem.href = data[field];
+                                        linkElem.classList.remove('hidden');
+                                        linkElem.parentElement.classList.remove('hidden');
+                                    } else {
+                                        linkElem.classList.add('hidden');
+                                        linkElem.parentElement.classList.add('hidden');
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    const modal = document.getElementById('modalDetailPengajuan');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                })
+                .catch(err => {
+                    alert('Gagal memuat data detail.');
+                    console.error(err);
+                });
+        }
 
       function closeModal() {
           const modal = document.getElementById('modalDetailPengajuan');

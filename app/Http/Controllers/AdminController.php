@@ -374,6 +374,33 @@ class AdminController extends Controller
             return $doc ? asset('private/protokol/'.$protocol->nomor_protokol."/". $doc->nama_file) : null;
         };
 
+        // Cek apakah ada dokumen tipe gdrive_link
+        $gdriveDoc = $protocol->documents->firstWhere('tipe_file', 'gdrive_link');
+        if ($gdriveDoc && !empty($gdriveDoc->nama_file)) {
+            // Jika ada link Google Drive, hanya tampilkan linknya saja
+            return response()->json([
+                'nomor_protokol'     => $protocol->nomor_protokol,
+                'nomor_protokol_asli'     => $protocol->nomor_protokol_asli,
+                'judul'              => $protocol->judul,
+                'subjek'             => $protocol->subjek_penelitian,
+                'jenis_penelitian'   => $protocol->jenis_penelitian,
+                'jenis_pengajuan'    => $protocol->jenis_pengajuan,
+                'biaya'              => $protocol->biaya_penelitian,
+                'tanggal_pengajuan' => $protocol->tanggal_pengajuan,
+                'kategori' => $protocol->kategori_review,
+
+                'nama'      => $peneliti->name ?? '-',
+                'email'     => $peneliti->email ?? '-',
+                'asal'      => $peneliti->alamat ?? '-',
+                'institusi' => $peneliti->institusi ?? '-',
+                'hp'        => $peneliti->nomor_hp ?? '-',
+                'status'    => $peneliti->status_peneliti ?? '-',
+
+                'gdrive_link' => $gdriveDoc->nama_file,
+            ]);
+        }
+
+        // Jika tidak, tampilkan struktur file seperti biasa
         return response()->json([
             'nomor_protokol'     => $protocol->nomor_protokol,
             'nomor_protokol_asli'     => $protocol->nomor_protokol_asli,
@@ -383,6 +410,7 @@ class AdminController extends Controller
             'jenis_pengajuan'    => $protocol->jenis_pengajuan,
             'biaya'              => $protocol->biaya_penelitian,
             'tanggal_pengajuan' => $protocol->tanggal_pengajuan,
+            'kategori' => $protocol->kategori_review,
 
             'nama'      => $peneliti->name ?? '-',
             'email'     => $peneliti->email ?? '-',
@@ -406,7 +434,7 @@ class AdminController extends Controller
             'lampiran_keputusan' => optional($protocol->putusan)->lampiran 
                 ? asset('private/lampiran/'.$protocol->nomor_protokol."/". $protocol->putusan->lampiran)
                 : null,
-                    ]);
+        ]);
     }
 
     public function updateTarif(Request $request){
@@ -474,6 +502,89 @@ class AdminController extends Controller
         return view('admin.dataPenelitian', [
             'title' => 'Data Penelitian',
             'protocols' => $protocols
+        ]);
+    }
+
+    public function getDataPenelitian($id){
+        $protocol = protocols::with(['peneliti', 'documents', 'putusan'])->findOrFail($id);
+        $peneliti = $protocol->peneliti;
+        $putusan = $protocol->putusan;
+
+        $getFile = function ($jenis) use ($protocol) {
+            $doc = $protocol->documents->firstWhere('tipe_file', $jenis);
+            return $doc ? asset('private/protokol/'.$protocol->nomor_protokol."/". $doc->nama_file) : null;
+        };
+
+        // Format tanggal menjadi hari, tanggal bulan tahun (contoh: Senin, 09 Agustus 2025)
+        $tanggalFormatted = null;
+        if ($protocol->tanggal_pengajuan) {
+            $tanggalFormatted = \Carbon\Carbon::parse($protocol->tanggal_pengajuan)->translatedFormat('l, d F Y');
+        }
+
+        // Cek apakah ada dokumen tipe gdrive_link
+        $gdriveDoc = $protocol->documents->firstWhere('tipe_file', 'gdrive_link');
+        if ($gdriveDoc && !empty($gdriveDoc->nama_file)) {
+            // Jika ada link Google Drive, hanya tampilkan linknya saja
+            return response()->json([
+                'nama' => $peneliti->name ?? '-',
+                'email' => $peneliti->email ?? '-',
+                'asal' => $peneliti->alamat ?? '-',
+                'institusi' => $peneliti->institusi ?? '-',
+                'hp' => $peneliti->nomor_hp ?? '-',
+                'status' => $peneliti->status_peneliti ?? '-',
+                'nomor_protokol_asli' => $protocol->nomor_protokol_asli,
+                'judul' => $protocol->judul,
+                'subjek' => $protocol->subjek_penelitian,
+                'jenis_penelitian' => $protocol->jenis_penelitian,
+                'jenis_pengajuan' => $protocol->jenis_pengajuan,
+                'tanggal_pengajuan' => $tanggalFormatted,
+                'biaya' => $protocol->biaya_penelitian, 
+                'kategori' => $protocol->kategori_review,
+                'hasil_akhir' => optional($putusan)->hasil_akhir ?? '-',
+                'tanggal_keputusan' => optional($putusan)?->created_at?->format('d-M-Y') ?? '-',
+                'penerimaan' => optional($putusan)->jenis_penerimaan ?? '-',
+                'komentar' => optional($putusan)->komentar ?? '-',
+                'lampiran_keputusan' => optional($putusan)->lampiran 
+                    ? asset('private/lampiran/'.$protocol->nomor_protokol."/". $putusan->lampiran)
+                    : null,
+                'gdrive_link' => $gdriveDoc->nama_file,
+            ]);
+        }
+
+        // Jika tidak, tampilkan struktur file seperti biasa
+        return response()->json([
+            'id' => $protocol->id,
+            'nomor_protokol_asli' => $protocol->nomor_protokol_asli,
+            'judul' => $protocol->judul,
+            'nama' => $peneliti->name ?? '-',
+            'email' => $peneliti->email ?? '-',
+            'asal' => $peneliti->alamat ?? '-',
+            'hp' => $peneliti->nomor_hp ?? '-',
+            'status' => $peneliti->status_peneliti ?? '-',
+            'subjek' => $protocol->subjek_penelitian ?? '-',
+            'jenis_penelitian' => $protocol->jenis_penelitian ?? '-',
+            'jenis_pengajuan' => $protocol->jenis_pengajuan ?? '-',
+            'biaya' => $protocol->biaya_penelitian ?? '-',
+            'kategori' => $protocol->kategori_review ?? '-',
+            'nomor_protokol' => $protocol->nomor_protokol,
+            'institusi' => $peneliti->institusi ?? '-',
+            'tanggal_pengajuan' => $tanggalFormatted,
+            'status_telaah' => $protocol->status_telaah,
+            'status_penelitian' => $protocol->status_penelitian,
+            'surat_permohonan' => $getFile('surat_permohonan'),
+            'surat_institusi' => $getFile('surat_institusi'),
+            'protokol_etik' => $getFile('protokol_etik'),
+            'informed_consent' => $getFile('informed_consent'),
+            'proposal_penelitian' => $getFile('proposal_penelitian'),
+            'sertifikat_gcp' => $getFile('sertifikat_gcp'),
+            'cv' => $getFile('cv'),
+            'hasil_akhir' => optional($putusan)->hasil_akhir ?? '-',
+            'tanggal_keputusan' => optional($putusan)?->created_at?->format('d-M-Y') ?? '-',
+            'penerimaan' => optional($putusan)->jenis_penerimaan ?? '-',
+            'komentar' => optional($putusan)->komentar ?? '-',
+            'lampiran_keputusan' => optional($putusan)->lampiran 
+                ? asset('private/lampiran/'.$protocol->nomor_protokol."/". $putusan->lampiran)
+                : null,
         ]);
     }
 

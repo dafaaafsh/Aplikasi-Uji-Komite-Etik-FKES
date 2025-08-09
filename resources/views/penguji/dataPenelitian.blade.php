@@ -104,81 +104,108 @@
         </div>
     </div>
 
-    <div id="modalDetailPengajuan" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 bg-opacity-40">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-4xl p-8 relative">
-            <!-- Tombol close -->
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-xl">×</button>
+    <div id="modalDetailPengajuan" class="fixed inset-0 z-50 hidden flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto">
+        <div class="flex items-start justify-center min-h-screen px-4 py-8">
+          <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl p-8 relative border border-gray-300">
 
-            <!-- Header -->
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Detail Pengajuan Penelitian</h2>
-
-            <!-- Peneliti -->
-            <div class="grid grid-cols-2 gap-4 text-sm text-gray-700">
-                <div>
-                    <p class="font-semibold">Nama Peneliti</p>
-                    <p id="d_nama" class="text-gray-900">-</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Email</p>
-                    <p id="d_email">-</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Nomor HP</p>
-                    <p id="d_hp">-</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Institusi</p>
-                    <p id="d_institusi">-</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Alamat</p>
-                    <p id="d_asal">-</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Status Peneliti</p>
-                    <p id="d_status">-</p>
-                </div>
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
+      
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Detail Protokol Penelitian</h2>
+      
+            <!-- Info Peneliti -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
+              <div>
+                <p class="font-semibold">Nama Peneliti</p>
+                <p id="d_nama" class="text-gray-900">-</p>
+              </div>
+              <div>
+                <p class="font-semibold">Email</p>
+                <p id="d_email">-</p>
+              </div>
+              <div>
+                <p class="font-semibold">Nomor HP</p>
+                <p id="d_hp">-</p>
+              </div>
+              <div>
+                <p class="font-semibold">Institusi</p>
+                <p id="d_institusi">-</p>
+              </div>
+              <div>
+                <p class="font-semibold">Alamat</p>
+                <p id="d_asal">-</p>
+              </div>
+              <div>
+                <p class="font-semibold">Status Peneliti</p>
+                <p id="d_status">-</p>
+              </div>
             </div>
-
+      
             <hr class="my-6 border-gray-300">
-
-            <!-- Protokol -->
-            <div class="grid grid-cols-2 gap-4 text-sm text-gray-700">
-                <div>
-                    <p class="font-semibold">Nomor Protokol</p>
-                    <p id="d_nomor_protokol" class="text-gray-900">-</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Judul Penelitian</p>
-                    <p id="d_judul">-</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Subjek Penelitian</p>
-                    <p id="d_subjek">-</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Jenis Penelitian</p>
-                    <p id="d_jenis_penelitian">-</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Jenis Pengajuan</p>
-                    <p id="d_jenis_pengajuan">-</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Biaya Penelitian</p>
-                    <p id="d_biaya">-</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Tanggal Pengajuan</p>
-                    <p id="d_tanggal">-</p>
-                </div>
-                <div>
-                    <p class="font-semibold">Kategori Review</p>
-                    <p id="d_kategori" class="px-3 py-1 mt-1 rounded-full text-center w-fit"> 
-                        -
-                    </p>
-                </div>
+      
+            <!-- Info Penelitian -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
+              <div>
+                <p class="font-semibold">Nomor Protokol</p>
+                <p id="d_nomor_protokol" class="text-gray-900">-</p>
+              </div>
+              <div>
+                <p class="font-semibold">Judul Penelitian</p>
+                <p id="d_judul">-</p>
+              </div>
+              <div>
+                <p class="font-semibold">Subjek Penelitian</p>
+                <p id="d_subjek">-</p>
+              </div>
+              <div>
+                <p class="font-semibold">Jenis Penelitian</p>
+                <p id="d_jenis_penelitian">-</p>
+              </div>
+              <div>
+                <p class="font-semibold">Jenis Pengajuan</p>
+                <p id="d_jenis_pengajuan">-</p>
+              </div>
+              <div>
+                <p class="font-semibold">Biaya Penelitian</p>
+                <p id="d_biaya">-</p>
+              </div>
+              <div>
+                <p class="font-semibold">Tanggal Pengajuan</p>
+                <p id="d_tanggal">-</p>
+              </div>
+              <div>
+                <p class="font-semibold">Klasifikasi penelitian</p>
+                <p id="d_kategori">-</p>
+              </div>
             </div>
+      
+            <hr class="my-6 border-gray-300">
+      
+            <!-- Dokumen -->
+            <div class="mt-8">
+              <h3 class="text-lg font-semibold text-gray-800 mb-4">Dokumen Terkait</h3>
+              <div class="space-y-3 text-sm text-gray-700 max-h-[40vh] overflow-y-auto pr-1">
+                @php
+                  $dokumenList = [
+                    'surat_permohonan' => 'Surat Permohonan',
+                    'surat_institusi' => 'Surat Institusi',
+                    'protokol_etik' => 'Protokol Etik',
+                    'informed_consent' => 'Informed Consent',
+                    'proposal_penelitian' => 'Proposal Penelitian',
+                    'sertifikat_gcp' => 'Sertifikat GCP',
+                    'cv' => 'Curriculum Vitae (CV)'
+                  ];
+                @endphp
+      
+                @foreach ($dokumenList as $key => $label)
+                  <div class="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 transition">
+                    <span class="font-medium text-gray-800">{{ $label }}</span>
+                    <a id="link-{{ $key }}" href="#" target="_blank"
+                      class="text-blue-600 hover:underline hidden">Lihat File</a>
+                  </div>
+                @endforeach
+              </div>
+            </div>
+          </div>
         </div>
     </div>
 
@@ -194,7 +221,7 @@
                     document.getElementById('d_hp').textContent = data.hp ?? '-';
                     document.getElementById('d_status').textContent = data.status ?? '-';
 
-                    document.getElementById('d_nomor_protokol').textContent = data.nomor_protokol ?? '-';
+                    document.getElementById('d_nomor_protokol').textContent = data.nomor_protokol_asli ?? '-';
                     document.getElementById('d_judul').textContent = data.judul ?? '-';
                     document.getElementById('d_subjek').textContent = data.subjek ?? '-';
                     document.getElementById('d_jenis_penelitian').textContent = data.jenis_penelitian ?? '-';
@@ -203,27 +230,58 @@
                     document.getElementById('d_tanggal').textContent = data.tanggal_pengajuan ?? '-';
                     document.getElementById('d_kategori').textContent = data.kategori ?? '-';
 
-                    const kategoriElem = document.getElementById('d_kategori');
-
-                    kategoriElem.classList.remove(
-                      'bg-yellow-100', 'text-yellow-600',
-                      'bg-red-100', 'text-red-600',
-                      'bg-blue-100', 'text-blue-600',
-                      'bg-green-100', 'text-green-600'
-                    );
-                                    
-                    if (data.kategori_review === 'Exempted') {
-                        kategoriElem.classList.add('bg-green-100', 'text-green-600');
-                    } else if (data.kategori_review === 'Expedited') {
-                        kategoriElem.classList.add('bg-yellow-100', 'text-yellow-600');
-                    } else if (data.kategori_review == 'Fullboard') {
-                        kategoriElem.classList.add('bg-red-100', 'text-red-600');
-                    } else {
-                        kategoriElem.classList.add('bg-blue-100', 'text-blue-600'); // fallback/default
+                    // Tampilkan hanya link Google Drive jika ada, jika tidak tampilkan struktur file seperti biasa
+                    let gdrive_link = data.gdrive_link;
+                    let gdriveRow = document.getElementById('gdrive-link-row');
+                    let gdriveAnchor = document.getElementById('gdrive-link-anchor');
+                    if (!gdriveRow) {
+                        // Tambahkan baris Google Drive link secara dinamis jika belum ada
+                        const docContainer = document.querySelector('.mt-8 .space-y-3');
+                        if (docContainer) {
+                            gdriveRow = document.createElement('div');
+                            gdriveRow.id = 'gdrive-link-row';
+                            gdriveRow.className = 'flex items-center justify-between border border-gray-200 rounded-lg px-4 py-2 bg-green-50';
+                            gdriveAnchor = document.createElement('a');
+                            gdriveAnchor.id = 'gdrive-link-anchor';
+                            gdriveAnchor.target = '_blank';
+                            gdriveAnchor.className = 'text-green-700 font-semibold break-all';
+                            gdriveRow.innerHTML = '<span class="font-medium text-gray-800">Google Drive Link</span>';
+                            gdriveRow.appendChild(gdriveAnchor);
+                            docContainer.prepend(gdriveRow);
+                        }
+                    }
+                    if (gdriveRow && gdriveAnchor) {
+                        if (gdrive_link) {
+                            gdriveAnchor.href = gdrive_link;
+                            gdriveAnchor.textContent = gdrive_link;
+                            gdriveRow.classList.remove('hidden');
+                            // Sembunyikan semua baris file PDF
+                            ['surat_permohonan', 'surat_institusi', 'protokol_etik', 'informed_consent', 'proposal_penelitian', 'sertifikat_gcp', 'cv'].forEach(field => {
+                                const linkElem = document.getElementById(`link-${field}`);
+                                if (linkElem) linkElem.parentElement.classList.add('hidden');
+                            });
+                        } else {
+                            if (gdriveRow) gdriveRow.classList.add('hidden');
+                            // Tampilkan file-file PDF yang tersedia (struktur tidak berubah)
+                            ['surat_permohonan', 'surat_institusi', 'protokol_etik', 'informed_consent', 'proposal_penelitian', 'sertifikat_gcp', 'cv'].forEach(field => {
+                                const linkElem = document.getElementById(`link-${field}`);
+                                if (linkElem) {
+                                    if (data[field]) {
+                                        linkElem.href = data[field];
+                                        linkElem.classList.remove('hidden');
+                                        linkElem.parentElement.classList.remove('hidden');
+                                    } else {
+                                        linkElem.classList.add('hidden');
+                                        linkElem.parentElement.classList.add('hidden');
+                                    }
+                                }
+                            });
+                        }
                     }
 
-                    document.getElementById('modalDetailPengajuan').classList.remove('hidden');
-                    document.getElementById('modalDetailPengajuan').classList.add('flex');
+                    const modal = document.getElementById('modalDetailPengajuan');
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
                 })
                 .catch(err => {
                     alert('Gagal memuat data detail.');

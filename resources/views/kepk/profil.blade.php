@@ -181,20 +181,56 @@
 
     <div>
       <label class="block text-sm font-medium text-gray-600">Password Lama</label>
-      <input type="password" name="current_password" required
-             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+      <div class="relative">
+        <input type="password" name="current_password" id="current_password" required
+               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10" />
+        <button type="button" tabindex="-1" onclick="togglePassword('current_password', this)" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-.274.955-.7 1.858-1.25 2.682M15.54 15.54A8.963 8.963 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.014 9.014 0 012.042-3.362" />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div>
       <label class="block text-sm font-medium text-gray-600">Password Baru</label>
-      <input type="password" name="new_password" required
-             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+      <div class="relative">
+        <input type="password" name="new_password" id="new_password" required
+               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10" oninput="validatePasswordStrength()" />
+        <button type="button" tabindex="-1" onclick="togglePassword('new_password', this)" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-.274.955-.7 1.858-1.25 2.682M15.54 15.54A8.963 8.963 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.014 9.014 0 012.042-3.362" />
+          </svg>
+        </button>
+      </div>
+      <div class="mt-1">
+        <div id="password-strength" class="text-xs font-semibold"></div>
+        <ul class="text-xs text-gray-500 mt-1 list-disc pl-5">
+          <li id="pw-minlength" class="">Minimal 8 karakter</li>
+          <li id="pw-uppercase" class="">Huruf besar (A-Z)</li>
+          <li id="pw-lowercase" class="">Huruf kecil (a-z)</li>
+          <li id="pw-number" class="">Angka (0-9)</li>
+        </ul>
+      </div>
     </div>
 
     <div>
       <label class="block text-sm font-medium text-gray-600">Konfirmasi Password Baru</label>
-      <input type="password" name="new_password_confirmation" required
-             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+      <div class="relative">
+        <input type="password" name="new_password_confirmation" id="new_password_confirmation" required
+               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10" oninput="validatePasswordMatch()" />
+        <button type="button" tabindex="-1" onclick="togglePassword('new_password_confirmation', this)" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-.274.955-.7 1.858-1.25 2.682M15.54 15.54A8.963 8.963 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.014 9.014 0 012.042-3.362" />
+          </svg>
+        </button>
+      </div>
+      <div class="mt-1">
+        <span id="password-match-message" class="text-xs font-semibold"></span>
+      </div>
     </div>
 
     <div>
@@ -262,6 +298,73 @@
     const modal = document.getElementById('modalAvatar');
     modal.classList.remove('block', 'flex');
     modal.classList.add('hidden')
+  }
+
+  // Toggle show/hide password
+  function togglePassword(fieldId, btn) {
+    const input = document.getElementById(fieldId);
+    if (!input) return;
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.querySelector('svg').classList.add('text-blue-600');
+    } else {
+      input.type = 'password';
+      btn.querySelector('svg').classList.remove('text-blue-600');
+    }
+  }
+
+  // Password strength validation
+  function validatePasswordStrength() {
+    const pw = document.getElementById('new_password').value;
+    let score = 0;
+    let minLength = pw.length >= 8;
+    let hasUpper = /[A-Z]/.test(pw);
+    let hasLower = /[a-z]/.test(pw);
+    let hasNumber = /[0-9]/.test(pw);
+    if (minLength) score++;
+    if (hasUpper) score++;
+    if (hasLower) score++;
+    if (hasNumber) score++;
+
+    // Update requirements color
+    document.getElementById('pw-minlength').className = minLength ? 'text-green-600' : 'text-gray-500';
+    document.getElementById('pw-uppercase').className = hasUpper ? 'text-green-600' : 'text-gray-500';
+    document.getElementById('pw-lowercase').className = hasLower ? 'text-green-600' : 'text-gray-500';
+    document.getElementById('pw-number').className = hasNumber ? 'text-green-600' : 'text-gray-500';
+
+    let strength = '';
+    let color = '';
+    if (score <= 1) {
+      strength = 'Lemah';
+      color = 'text-red-600';
+    } else if (score === 2 || score === 3) {
+      strength = 'Sedang';
+      color = 'text-yellow-600';
+    } else if (score === 4) {
+      strength = 'Kuat';
+      color = 'text-green-600';
+    }
+    document.getElementById('password-strength').textContent = 'Kekuatan Password: ' + strength;
+    document.getElementById('password-strength').className = 'text-xs font-semibold ' + color;
+  }
+
+  // Password match validation
+  function validatePasswordMatch() {
+    const pw = document.getElementById('new_password').value;
+    const confirm = document.getElementById('new_password_confirmation').value;
+    const msg = document.getElementById('password-match-message');
+    if (!confirm) {
+      msg.textContent = '';
+      msg.className = 'text-xs font-semibold';
+      return;
+    }
+    if (pw === confirm) {
+      msg.textContent = 'Password cocok';
+      msg.className = 'text-xs font-semibold text-green-600';
+    } else {
+      msg.textContent = 'Password tidak cocok';
+      msg.className = 'text-xs font-semibold text-red-600';
+    }
   }
 </script>
     

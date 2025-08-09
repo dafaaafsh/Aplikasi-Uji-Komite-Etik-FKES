@@ -268,7 +268,7 @@
         <!-- Dokumen -->
         <div class="mt-10">
           <h3 class="text-lg font-semibold text-gray-800 mb-4">Dokumen Terkait</h3>
-          <div class="space-y-3 text-sm text-gray-700 max-h-[40vh] overflow-y-auto pr-1">
+          <div id="dokumenTerkaitBox" class="space-y-3 text-sm text-gray-700 max-h-[40vh] overflow-y-auto pr-1">
             @php
               $dokumenList = [
                 'surat_permohonan' => 'Surat Permohonan',
@@ -280,7 +280,7 @@
                 'cv' => 'Curriculum Vitae (CV)'
               ];
             @endphp
-  
+
             @foreach ($dokumenList as $key => $label)
               <div class="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 transition">
                 <span class="font-medium text-gray-800">{{ $label }}</span>
@@ -288,6 +288,12 @@
                    class="text-blue-600 hover:underline hidden">Lihat File</a>
               </div>
             @endforeach
+
+            <!-- Tempatkan link Google Drive jika ada -->
+            <div id="gdrive-link-row" class="flex items-center justify-between border border-blue-200 rounded-lg px-4 py-2 bg-blue-50 hidden">
+              <span class="font-medium text-blue-800">Link Google Drive (semua dokumen)</span>
+              <a id="gdrive-link-anchor" href="#" target="_blank" class="text-blue-700 font-semibold underline break-all"></a>
+            </div>
           </div>
         </div>
   
@@ -425,10 +431,28 @@
           if (!response.ok) throw new Error('Gagal mengambil data');
           return response.json();
         })
-        .then(data => showDetailModal(data))
+        .then(async data => {
+          // Ambil dokumen gdrive jika ada
+          let gdrive_link = null;
+          try {
+            const res = await fetch(`/peneliti/penelitian/gdrive-link/${id}`);
+            if (res.ok) {
+              const d = await res.json();
+              if (d && d.gdrive_link) gdrive_link = d.gdrive_link;
+            }
+          } catch {}
+          data.gdrive_link = gdrive_link;
+          showDetailModal(data);
+        })
         .catch(error => alert(error));
     }
 
+    /**
+     * Menampilkan modal detail penelitian.
+     * Jika mode Google Drive link, hanya tampilkan link dan sembunyikan file PDF.
+     * Jika mode file upload, tampilkan daftar file PDF yang tersedia.
+     * Tombol Edit Data hanya muncul jika mode file dan status Diperiksa/Dikembalikan.
+     */
     function showDetailModal(data) {
       document.getElementById('detailModal').classList.remove('hidden');
 
@@ -453,12 +477,102 @@
         colorStat.classList.add('bg-gray-200','text-gray-700');    
       }
       
+
       const btnEdit = document.getElementById('btn-edit');
-      if (data.status === 'Diperiksa' || data.status === 'Dikembalikan') {
+      // Jika mode Google Drive link, tombol edit hanya muncul untuk mengganti link saja
+      if (data.gdrive_link) {
         btnEdit.classList.remove('hidden');
+        btnEdit.textContent = 'Ganti Link Google Drive';
+        btnEdit.onclick = function() {
+          openEditGDriveModal(data);
+        };
+      } else if (data.status === 'Diperiksa' || data.status === 'Dikembalikan') {
+        btnEdit.classList.remove('hidden');
+        btnEdit.textContent = 'Edit Data';
+        btnEdit.onclick = function() {
+          openEditModal();
+        };
       } else {
         btnEdit.classList.add('hidden');
       }
+
+      // Modal khusus untuk edit link Google Drive
+      if (!document.getElementById('editGDriveModal')) {
+        const modal = document.createElement('div');
+        modal.id = 'editGDriveModal';
+        modal.className = 'fixed inset-0 z-50 hidden backdrop-blur-sm bg-black/50 flex items-center justify-center overflow-auto px-4 py-8';
+        modal.innerHTML = `
+          <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-gray-300 relative p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Ganti Link Google Drive</h2>
+            <form id="formEditGDrive" class="space-y-6" action="/peneliti/pengajuanPenelitian/updateGDriveLink" method="POST">
+              @csrf
+              <div>
+                <label for="gdrive_link_input" class="block text-sm font-medium text-gray-700">Link Google Drive</label>
+                <input type="url" name="gdrive_link" id="gdrive_link_input" required class="mt-1 w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" pattern="https://(drive|docs)\.google\.com/.*" />
+              </div>
+              <div id="edit-gdrive-error" class="text-red-600 text-xs mb-2 hidden"></div>
+              <div class="flex justify-between items-center pt-6 border-t border-gray-200">
+                <button type="button" onclick="document.getElementById('editGDriveModal').classList.add('hidden')" class="text-gray-600 hover:text-gray-800 text-sm font-medium px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-300">Batal</button>
+                <button type="submit" class="inline-flex items-center px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow focus:outline-none focus:ring-2 focus:ring-blue-400">Simpan Perubahan</button>
+              </div>
+            </form>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+
+      window.openEditGDriveModal = function(data) {
+        const modal = document.getElementById('editGDriveModal');
+        modal.classList.remove('hidden');
+        document.getElementById('gdrive_link_input').value = data.gdrive_link || '';
+        document.getElementById('edit-gdrive-error').classList.add('hidden');
+        const form = document.getElementById('formEditGDrive');
+        // Pastikan meta csrf-token ada sebelum akses getAttribute
+        let csrfToken = '';
+        const metaCsrf = document.querySelector('meta[name="csrf-token"]');
+        if (metaCsrf) {
+          csrfToken = metaCsrf.getAttribute('content');
+        }
+        form.onsubmit = function(e) {
+          e.preventDefault();
+          const gdrive_link = document.getElementById('gdrive_link_input').value;
+          const errorDiv = document.getElementById('edit-gdrive-error');
+          errorDiv.classList.add('hidden');
+          // Validasi sederhana di sisi klien
+          if (!/^https:\/\/(drive|docs)\.google\.com\//.test(gdrive_link)) {
+            errorDiv.textContent = 'Link harus berupa URL Google Drive yang valid';
+            errorDiv.classList.remove('hidden');
+            return;
+          }
+          // Kirim ke endpoint updateGDriveLink (bukan updateDocument)
+          fetch('/peneliti/pengajuanPenelitian/updateGDriveLink', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {})
+            },
+            body: JSON.stringify({
+              protocol_id: data.id,
+              gdrive_link
+            })
+          })
+          .then(res => res.json())
+          .then(resp => {
+            if (resp.success) {
+              alert('Link Google Drive berhasil diperbarui!');
+              modal.classList.add('hidden');
+              location.reload();
+            } else {
+              errorDiv.textContent = resp.message || 'Gagal memperbarui link.';
+              errorDiv.classList.remove('hidden');
+            }
+          })
+          .catch(() => {
+            errorDiv.textContent = 'Gagal memperbarui link.';
+            errorDiv.classList.remove('hidden');
+          });
+        };
+      };
 
       if (data.komentar) {
           document.getElementById('detail-alasan').textContent = data.komentar;
@@ -467,21 +581,39 @@
           document.getElementById('alasan-box').classList.add('hidden');
       }
 
-      const fields = [
-        'surat_permohonan', 'surat_institusi', 'protokol_etik',
-        'informed_consent', 'proposal_penelitian', 'sertifikat_gcp', 'cv'
-      ];
 
-      fields.forEach(field => {
-        const linkElem = document.getElementById(`link-${field}`);
-        if (data[field]) {
-          linkElem.href = data[field];
-          linkElem.textContent = "Lihat File";
-          linkElem.classList.remove('hidden');
-        } else {
-          linkElem.classList.add('hidden');
-        }
-      });
+      /**
+       * Tampilkan dokumen:
+       * - Jika ada link Google Drive, tampilkan hanya baris link Google Drive dan sembunyikan semua baris file PDF.
+       * - Jika tidak ada link Google Drive, tampilkan file-file PDF yang tersedia, baris lain disembunyikan.
+       */
+      const gdriveRow = document.getElementById('gdrive-link-row');
+      const gdriveAnchor = document.getElementById('gdrive-link-anchor');
+      if (data.gdrive_link) {
+        gdriveAnchor.href = data.gdrive_link;
+        gdriveAnchor.textContent = data.gdrive_link;
+        gdriveRow.classList.remove('hidden');
+        // Sembunyikan semua baris file PDF
+        ['surat_permohonan', 'surat_institusi', 'protokol_etik', 'informed_consent', 'proposal_penelitian', 'sertifikat_gcp', 'cv'].forEach(field => {
+          const linkElem = document.getElementById(`link-${field}`);
+          if (linkElem) linkElem.parentElement.classList.add('hidden');
+        });
+      } else {
+        gdriveRow.classList.add('hidden');
+        // Tampilkan file-file PDF yang tersedia
+        ['surat_permohonan', 'surat_institusi', 'protokol_etik', 'informed_consent', 'proposal_penelitian', 'sertifikat_gcp', 'cv'].forEach(field => {
+          const linkElem = document.getElementById(`link-${field}`);
+          if (data[field]) {
+            linkElem.href = data[field];
+            linkElem.textContent = "Lihat File";
+            linkElem.classList.remove('hidden');
+            linkElem.parentElement.classList.remove('hidden');
+          } else {
+            linkElem.classList.add('hidden');
+            linkElem.parentElement.classList.add('hidden');
+          }
+        });
+      }
 
       const reviewButton = document.getElementById('btn-review');
       reviewButton.removeAttribute('onclick');

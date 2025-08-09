@@ -204,6 +204,10 @@
                 <p class="font-semibold">Tanggal Pengajuan</p>
                 <p id="d_tanggal">-</p>
               </div>
+              <div>
+                <p class="font-semibold">Kategori Review</p>
+                <p id="d_kategori">-</p>
+              </div>
             </div>
       
             <hr class="my-6 border-gray-300">
@@ -212,6 +216,11 @@
             <div class="mt-8">
               <h3 class="text-lg font-semibold text-gray-800 mb-4">Dokumen Terkait</h3>
               <div class="space-y-3 text-sm text-gray-700 max-h-[40vh] overflow-y-auto pr-1">
+                <!-- Link Google Drive, hidden by default -->
+                <div id="gdrive-link-wrapper" class="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 transition hidden">
+                  <span class="font-medium text-gray-800">Google Drive</span>
+                  <a id="link-gdrive" href="#" target="_blank" class="text-blue-600 hover:underline">Lihat Dokumen Google Drive</a>
+                </div>
                 @php
                   $dokumenList = [
                     'surat_permohonan' => 'Surat Permohonan',
@@ -223,7 +232,6 @@
                     'cv' => 'Curriculum Vitae (CV)'
                   ];
                 @endphp
-      
                 @foreach ($dokumenList as $key => $label)
                   <div class="flex items-center justify-between border border-gray-200 rounded-lg px-4 py-2 hover:bg-gray-50 transition">
                     <span class="font-medium text-gray-800">{{ $label }}</span>
@@ -268,7 +276,7 @@
 
     <script>
         function loadDetailData(id) {
-            fetch(`/admin/pengajuanPenelitian/${id}`)
+            fetch(`/admin/dataPenelitian/detail/${id}`)
                 .then(res => res.json())
                 .then(data => {
                     document.getElementById('d_nama').textContent = data.nama ?? '-';
@@ -277,7 +285,7 @@
                     document.getElementById('d_institusi').textContent = data.institusi ?? '-';
                     document.getElementById('d_hp').textContent = data.hp ?? '-';
                     document.getElementById('d_status').textContent = data.status ?? '-';
-                
+
                     document.getElementById('d_nomor_protokol').textContent = data.nomor_protokol_asli ?? '-';
                     document.getElementById('d_judul').textContent = data.judul ?? '-';
                     document.getElementById('d_subjek').textContent = data.subjek ?? '-';
@@ -285,6 +293,7 @@
                     document.getElementById('d_jenis_pengajuan').textContent = data.jenis_pengajuan ?? '-';
                     document.getElementById('d_biaya').textContent = data.biaya ?? '-';
                     document.getElementById('d_tanggal').textContent = data.tanggal_pengajuan ?? '-';
+                    document.getElementById('d_kategori').textContent = data.kategori ?? '-';
 
                     document.getElementById('d_hasil_keputusan').textContent = data.hasil_akhir ?? '-';
                     document.getElementById('d_tanggal_keputusan').textContent = data.tanggal_keputusan ?? '-';
@@ -306,7 +315,8 @@
                     } else {
                         document.getElementById('d_hasil_keputusan').classList.add('text-gray-600');
                     }
-                
+
+                    // Dokumen mode: Google Drive link atau file
                     const dokumenFields = [
                         'surat_permohonan',
                         'surat_institusi',
@@ -316,18 +326,39 @@
                         'sertifikat_gcp',
                         'cv'
                     ];
-                
-                    dokumenFields.forEach(key => {
-                        const link = document.getElementById('link-' + key);
-                        if (data[key]) {
-                            link.href = data[key];
-                            link.classList.remove('hidden');
-                        } else {
+                    const gdriveLink = document.getElementById('link-gdrive');
+                    const gdriveWrapper = document.getElementById('gdrive-link-wrapper');
+                    if (data.gdrive_link) {
+                        // Tampilkan hanya link Google Drive, sembunyikan semua file
+                        gdriveLink.href = data.gdrive_link;
+                        gdriveLink.textContent = 'Lihat Dokumen Google Drive';
+                        gdriveLink.classList.remove('hidden');
+                        gdriveWrapper.classList.remove('hidden');
+                        // Sembunyikan semua file dokumen
+                        dokumenFields.forEach(key => {
+                            const link = document.getElementById('link-' + key);
                             link.href = '#';
-                            link.classList.add('hidden');
-                        }
-                    });
-                
+                            link.parentElement.classList.add('hidden');
+                        });
+                    } else {
+                        // Tampilkan file dokumen seperti biasa, sembunyikan link Google Drive
+                        gdriveLink.href = '#';
+                        gdriveLink.classList.add('hidden');
+                        gdriveWrapper.classList.add('hidden');
+                        dokumenFields.forEach(key => {
+                            const link = document.getElementById('link-' + key);
+                            if (data[key]) {
+                                link.href = data[key];
+                                link.classList.remove('hidden');
+                                link.parentElement.classList.remove('hidden');
+                            } else {
+                                link.href = '#';
+                                link.classList.add('hidden');
+                                link.parentElement.classList.add('hidden');
+                            }
+                        });
+                    }
+
                     const modal = document.getElementById('modalDetailPengajuan');
                     modal.classList.remove('hidden');
                     modal.classList.add('flex');

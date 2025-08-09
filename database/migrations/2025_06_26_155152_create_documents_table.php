@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('protocol_id');
-            $table->string('tipe_file'); 
-            $table->string('nama_file'); 
+            $table->string('tipe_file')->nullable(); 
+            $table->string('nama_file')->nullable();
             $table->timestamps();
 
             $table->foreign('protocol_id')->references('id')->on('protocols')->onDelete('cascade');

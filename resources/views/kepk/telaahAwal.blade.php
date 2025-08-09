@@ -224,12 +224,12 @@
 
     {{-- Modal Detail --}}
     <div id="modalDetailPengajuan" class="fixed inset-0 z-50 hidden flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto">
-        <div class="flex items-start justify-center min-h-screen w-screen px-4 py-8">
+        <div class="flex items-start justify-center min-h-screen px-4 py-8">
           <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl p-8 relative border border-gray-300">
 
             <button onclick="closeModalDetail()" class="absolute top-4 right-4 text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
       
-            <h2 class="text-2xl font-bold text-gray-800 mb-6">Detail Pengajuan Penelitian</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Detail Protokol Penelitian</h2>
       
             <!-- Info Peneliti -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-700">
@@ -414,7 +414,7 @@
 
     <script>
         function loadDetailData(id) {
-            fetch(`/kepk/dataPenelitian/${id}`)
+            fetch(`/kepk/telaahAkhir/${id}`)
                 .then(res => res.json())
                 .then(data => {
                     document.getElementById('d_nama').textContent = data.nama ?? '-';
@@ -423,8 +423,8 @@
                     document.getElementById('d_institusi').textContent = data.institusi ?? '-';
                     document.getElementById('d_hp').textContent = data.hp ?? '-';
                     document.getElementById('d_status').textContent = data.status ?? '-';
-                
-                    document.getElementById('d_nomor_protokol').textContent = data.nomor_protokol ?? '-';
+
+                    document.getElementById('d_nomor_protokol').textContent = data.nomor_protokol_asli ?? '-';
                     document.getElementById('d_judul').textContent = data.judul ?? '-';
                     document.getElementById('d_subjek').textContent = data.subjek ?? '-';
                     document.getElementById('d_jenis_penelitian').textContent = data.jenis_penelitian ?? '-';
@@ -432,28 +432,56 @@
                     document.getElementById('d_biaya').textContent = data.biaya ?? '-';
                     document.getElementById('d_tanggal').textContent = data.tanggal_pengajuan ?? '-';
                     document.getElementById('d_kategori').textContent = data.kategori ?? '-';
-                
-                    const dokumenFields = [
-                        'surat_permohonan',
-                        'surat_institusi',
-                        'protokol_etik',
-                        'informed_consent',
-                        'proposal_penelitian',
-                        'sertifikat_gcp',
-                        'cv'
-                    ];
-                
-                    dokumenFields.forEach(key => {
-                        const link = document.getElementById('link-' + key);
-                        if (data[key]) {
-                            link.href = data[key];
-                            link.classList.remove('hidden');
-                        } else {
-                            link.href = '#';
-                            link.classList.add('hidden');
+
+                    // Tampilkan hanya link Google Drive jika ada, jika tidak tampilkan struktur file seperti biasa
+                    let gdrive_link = data.gdrive_link;
+                    let gdriveRow = document.getElementById('gdrive-link-row');
+                    let gdriveAnchor = document.getElementById('gdrive-link-anchor');
+                    if (!gdriveRow) {
+                        // Tambahkan baris Google Drive link secara dinamis jika belum ada
+                        const docContainer = document.querySelector('.mt-8 .space-y-3');
+                        if (docContainer) {
+                            gdriveRow = document.createElement('div');
+                            gdriveRow.id = 'gdrive-link-row';
+                            gdriveRow.className = 'flex items-center justify-between border border-gray-200 rounded-lg px-4 py-2 bg-green-50';
+                            gdriveAnchor = document.createElement('a');
+                            gdriveAnchor.id = 'gdrive-link-anchor';
+                            gdriveAnchor.target = '_blank';
+                            gdriveAnchor.className = 'text-green-700 font-semibold break-all';
+                            gdriveRow.innerHTML = '<span class="font-medium text-gray-800">Google Drive Link</span>';
+                            gdriveRow.appendChild(gdriveAnchor);
+                            docContainer.prepend(gdriveRow);
                         }
-                    });
-                
+                    }
+                    if (gdriveRow && gdriveAnchor) {
+                        if (gdrive_link) {
+                            gdriveAnchor.href = gdrive_link;
+                            gdriveAnchor.textContent = gdrive_link;
+                            gdriveRow.classList.remove('hidden');
+                            // Sembunyikan semua baris file PDF
+                            ['surat_permohonan', 'surat_institusi', 'protokol_etik', 'informed_consent', 'proposal_penelitian', 'sertifikat_gcp', 'cv'].forEach(field => {
+                                const linkElem = document.getElementById(`link-${field}`);
+                                if (linkElem) linkElem.parentElement.classList.add('hidden');
+                            });
+                        } else {
+                            if (gdriveRow) gdriveRow.classList.add('hidden');
+                            // Tampilkan file-file PDF yang tersedia (struktur tidak berubah)
+                            ['surat_permohonan', 'surat_institusi', 'protokol_etik', 'informed_consent', 'proposal_penelitian', 'sertifikat_gcp', 'cv'].forEach(field => {
+                                const linkElem = document.getElementById(`link-${field}`);
+                                if (linkElem) {
+                                    if (data[field]) {
+                                        linkElem.href = data[field];
+                                        linkElem.classList.remove('hidden');
+                                        linkElem.parentElement.classList.remove('hidden');
+                                    } else {
+                                        linkElem.classList.add('hidden');
+                                        linkElem.parentElement.classList.add('hidden');
+                                    }
+                                }
+                            });
+                        }
+                    }
+
                     const modal = document.getElementById('modalDetailPengajuan');
                     modal.classList.remove('hidden');
                     modal.classList.add('flex');
@@ -520,52 +548,58 @@
         }
 
         function openModalReviewList(reviews) {
-              const container = document.getElementById('review_list');
-              document.getElementById('modalReview').classList.remove('hidden');
-              container.innerHTML = '';
+    const container = document.getElementById('review_list');
+    document.getElementById('modalReview').classList.remove('hidden');
+    container.innerHTML = '';
 
-              if (reviews.length === 0) {
-                container.innerHTML = `
-                  <div class="text-center text-gray-500 italic">
-                    <svg class="mx-auto mb-2 w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-4h6v4m-3 4a9 9 0 100-18 9 9 0 000 18z" />
-                    </svg>
-                    Tidak ada review tersedia.
-                  </div>
-                `;
-                return;
-              }
-          
-              reviews.forEach((review, i) => {
-                const color = getBadgeColor(review.hasil);
-                const colorCatatan = getColorCatatan(review.catatan);
-            
-                const item = document.createElement('div');
-                item.className = 'bg-gray-100 hover:shadow-xl transition-all ease-in-out duration-700 ease-in-out shadow-md border border-gray-500 rounded-xl p-6 space-y-4';
-            
-                item.innerHTML = `
-                  <div class="flex items-center justify-between">
+    if (reviews.length === 0) {
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-8">
+                <svg class="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9 9 4.03 9 9z"/></svg>
+                <div class="text-center text-gray-500 italic">Tidak ada review tersedia.</div>
+            </div>
+        `;
+        return;
+    }
+
+    reviews.forEach((review, i) => {
+        const color = getBadgeColor(review.hasil);
+        const colorCatatan = getColorCatatan(review.catatan);
+
+        const item = document.createElement('div');
+        item.className = 'relative bg-gradient-to-br from-white via-gray-50 to-blue-50 hover:shadow-2xl transition-all duration-500 shadow-md border border-gray-200 rounded-2xl p-6 space-y-4 group';
+
+        item.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-lg shadow">
+                        <span>${review.nama.charAt(0).toUpperCase()}</span>
+                    </div>
                     <div>
-                      <h3 class="text-lg font-semibold text-gray-800">${review.nama}</h3>
-                      <p class="text-sm text-gray-500">Ditinjau pada ${review.tanggal}</p>
+                        <h3 class="text-lg font-semibold text-gray-800">${review.nama}</h3>
+                        <p class="text-xs text-gray-400">Ditinjau pada ${review.tanggal}</p>
                     </div>
-                    <span class="inline-block text-sm px-3 py-1 rounded-full font-medium ${color.bg} ${color.text}">
-                      ${review.hasil}
-                    </span>
-                  </div>
-              
-                  <div>
-                    <p class="text-sm text-gray-600 mb-1 font-semibold">Catatan Reviewer:</p>
-                    <div class="bg-white ${colorCatatan.text} border border-gray-500 rounded-md p-4 text-sm leading-relaxed whitespace-pre-line">${review.catatan}
-                    </div>
-                  </div>
-                  <div class="mt-2">
-                    <a href="${review.link}" target="_blank" class="text-blue-600 hover:underline text-sm">Lihat Lampiran</a>
-                  </div>
-                `;
-              
-                  container.appendChild(item);
-                });
+                </div>
+                <span class="inline-block text-xs px-3 py-1 rounded-full font-semibold ${color.bg} ${color.text} shadow-sm border border-white">
+                    ${review.hasil}
+                </span>
+            </div>
+            <div>
+                <p class="text-sm text-gray-600 mb-1 font-semibold">Catatan Reviewer:</p>
+                <div class="bg-white ${colorCatatan.text} border border-gray-200 rounded-md p-4 text-sm leading-relaxed whitespace-pre-line shadow-inner">${review.catatan}</div>
+            </div>
+            <div class="mt-2 flex items-center gap-2">
+                <a href="${review.link}" target="_blank" class="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-xs font-semibold shadow transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Lihat Lampiran
+                </a>
+            </div>
+            <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <span class="inline-block bg-gray-200 text-gray-600 text-xs px-2 py-1 rounded shadow">Review #${i+1}</span>
+            </div>
+        `;
+        container.appendChild(item);
+    });
         }
 
         function closeModalReview() {

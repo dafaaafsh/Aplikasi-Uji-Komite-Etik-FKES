@@ -10,7 +10,7 @@
           <div class="flex items-center space-x-4">
             <img 
               @if (!empty($user->avatar_path))
-                src="{{ asset("storage/". $user->avatar_path )}}"
+                src="{{ asset("public/". $user->avatar_path )}}"
               @else
                 src="https://media.istockphoto.com/id/1330286085/vector/male-avatar-icon.jpg?s=612x612&w=is&k=20&c=U9zDXcxk0pkE6Yz0MtNOwW1LG1Njkzglx7Wtp16-ho4="
               @endif
@@ -226,20 +226,38 @@
 
     <div>
       <label class="block text-sm font-medium text-gray-600">Password Lama</label>
-      <input type="password" name="current_password" required
-             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+      <div class="relative">
+        <input type="password" name="current_password" id="current_password" required
+               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10" />
+        <button type="button" tabindex="-1" onclick="togglePassword('current_password', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-700 focus:outline-none">
+          <svg id="icon-current_password" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+        </button>
+      </div>
     </div>
 
     <div>
       <label class="block text-sm font-medium text-gray-600">Password Baru</label>
-      <input type="password" name="new_password" required
-             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+      <div class="relative">
+        <input type="password" name="new_password" id="new_password" required
+               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10" oninput="checkPasswordStrength()" />
+        <button type="button" tabindex="-1" onclick="togglePassword('new_password', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-700 focus:outline-none">
+          <svg id="icon-new_password" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+        </button>
+      </div>
+      <div class="text-xs text-gray-600 mt-1">Password minimal 6 karakter, mengandung huruf besar, angka, dan simbol untuk keamanan maksimal.</div>
+      <div id="passwordStrength" class="text-xs mb-1"></div>
     </div>
 
     <div>
       <label class="block text-sm font-medium text-gray-600">Konfirmasi Password Baru</label>
-      <input type="password" name="new_password_confirmation" required
-             class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+      <div class="relative">
+        <input type="password" name="new_password_confirmation" id="new_password_confirmation" required
+               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10" oninput="checkPasswordMatch()" />
+        <button type="button" tabindex="-1" onclick="togglePassword('new_password_confirmation', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-700 focus:outline-none">
+          <svg id="icon-new_password_confirmation" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+        </button>
+      </div>
+      <div id="passwordConfirmError" class="text-xs text-red-600 mb-2 hidden"></div>
     </div>
 
     <div>
@@ -249,6 +267,58 @@
       </button>
     </div>
   </form>
+  <script>
+    function togglePassword(fieldId, btn) {
+      const input = document.getElementById(fieldId);
+      const icon = btn.querySelector('svg');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.293-3.95m3.362-2.568A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.956 9.956 0 01-4.043 5.306M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />';
+      } else {
+        input.type = 'password';
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+      }
+    }
+    // Password strength checker
+    function checkPasswordStrength() {
+      const password = document.getElementById('new_password').value;
+      const strengthDiv = document.getElementById('passwordStrength');
+      let strength = 0;
+      if (password.length >= 6) strength++;
+      if (/[A-Z]/.test(password)) strength++;
+      if (/[0-9]/.test(password)) strength++;
+      if (/[^A-Za-z0-9]/.test(password)) strength++;
+      let status = '';
+      let color = '';
+      if (password.length === 0) {
+        status = '';
+      } else if (strength <= 1) {
+        status = 'Lemah';
+        color = 'text-red-600';
+      } else if (strength === 2 || strength === 3) {
+        status = 'Sedang';
+        color = 'text-yellow-600';
+      } else if (strength >= 4) {
+        status = 'Kuat';
+        color = 'text-green-600';
+      }
+      strengthDiv.textContent = status ? `Password: ${status}` : '';
+      strengthDiv.className = `text-xs mb-1 font-semibold ${color}`;
+    }
+    // Password match checker
+    function checkPasswordMatch() {
+      const pass = document.getElementById('new_password').value;
+      const confirm = document.getElementById('new_password_confirmation').value;
+      const errorDiv = document.getElementById('passwordConfirmError');
+      if (confirm && pass !== confirm) {
+        errorDiv.textContent = 'Konfirmasi password tidak sama.';
+        errorDiv.classList.remove('hidden');
+      } else {
+        errorDiv.textContent = '';
+        errorDiv.classList.add('hidden');
+      }
+    }
+  </script>
   </div>
 
 <!-- Modal Avatar -->

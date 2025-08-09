@@ -122,6 +122,20 @@
   <div class="mt-12 bg-white rounded-xl shadow-xl p-8 max-w-3xl mx-auto">
     <h2 class="text-xl font-bold mb-6 text-gray-800">Form Pengajuan Penelitian</h2>
     <form id="pengajuanForm" action="{{ route('pengajuan.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6" onsubmit="return validateAllFileInputs(event)">
+      <div class="mb-6">
+        <label class="block text-md font-semibold text-gray-700 mb-2">Pilih Metode Pengajuan</label>
+        <div class="flex gap-6">
+          <label class="inline-flex items-center">
+            <input type="radio" name="submission_mode" value="upload" checked onclick="toggleSubmissionMode('upload')" class="form-radio text-blue-600" />
+            <span class="ml-2">Upload Semua Dokumen (PDF)</span>
+          </label>
+          <label class="inline-flex items-center">
+            <input type="radio" name="submission_mode" value="gdrive" onclick="toggleSubmissionMode('gdrive')" class="form-radio text-blue-600" />
+            <span class="ml-2">Upload Link Google Drive</span>
+          </label>
+        </div>
+        <p class="text-xs text-gray-500 mt-2">Pilih salah satu metode: upload seluruh dokumen PDF <span class="font-semibold">atau</span> cukup kirimkan satu link Google Drive berisi semua dokumen.</p>
+      </div>
   <script>
     // Validasi semua file input sebelum submit form
     function validateAllFileInputs(e) {
@@ -169,55 +183,77 @@
         @enderror
       </div>
 
-      <!-- File Uploads -->
-      @php
-      $fields = [
-        'surat_permohonan' => 'Surat Permohonan Uji Kaji Etik Penelitian',
-        'surat_institusi' => 'Surat Keterangan dari Institusi',
-        'protokol_etik' => 'Protokol Etik Penelitian',
-        'informed_consent' => 'Informed Consent / Penjelasan Sebelum Penelitian',
-        'proposal_penelitian' => 'Proposal Penelitian Lengkap + Instrumen',
-        'sertifikat_gcp' => 'Sertifikat Good Clinical Practice (Opsional)',
-        'cv' => 'Curriculum Vitae (CV)'
-      ];
-      @endphp
 
-      @foreach ($fields as $name => $label)
-      <div>
-        <label class="block text-md font-medium text-gray-700 mb-1" for="{{ $name }}">
-          {{ $label }} (PDF)
-          @if($name === 'sertifikat_gcp')
-            <span class="ml-1 text-blue-600 text-xs font-semibold align-middle">(Opsional)</span>
-          @else
-            <span class="ml-1 text-red-500 text-xs font-semibold align-middle">(Wajib diisi)</span>
-          @endif
-        </label>
-        <p class="text-xs text-gray-500 mb-1">
-          <span class="block mb-1">
-            <span class="font-semibold">Ketentuan:</span> File <span class="font-semibold text-blue-700">PDF</span>, maksimal <span class="font-semibold">10MB</span>
-          </span>
-        </p>
-        <div class="relative">
-          <input type="file" id="{{ $name }}" name="{{ $name }}" accept="application/pdf"
-            class="mt-1 block w-full text-sm text-gray-700 border border-gray-300 rounded-lg file:bg-blue-50 file:border-0 file:py-2 file:px-4 file:text-blue-600 file:font-semibold hover:file:bg-blue-100 @error($name) border-red-500 @enderror pr-10"
-            onchange="showFileProgressAndPreview(this)" 
-            @if($name !== 'sertifikat_gcp') @endif
-            oninput="validateFileInput(this)"
-            data-label="{{ $label }}"
-            data-max="10485760"
-          />
-          <div class="w-full h-2 bg-gray-200 rounded mt-2 overflow-hidden" id="progressbar-{{ $name }}" style="display:none;">
-            <div class="h-2 bg-blue-500 transition-all duration-300" style="width:0%"></div>
+      <!-- File Uploads (default) -->
+      <div id="uploadFieldsSection">
+        @php
+        $fields = [
+          'surat_permohonan' => 'Surat Permohonan Uji Kaji Etik Penelitian',
+          'surat_institusi' => 'Surat Keterangan dari Institusi',
+          'protokol_etik' => 'Protokol Etik Penelitian',
+          'informed_consent' => 'Informed Consent / Penjelasan Sebelum Penelitian',
+          'proposal_penelitian' => 'Proposal Penelitian Lengkap + Instrumen',
+          'sertifikat_gcp' => 'Sertifikat Good Clinical Practice (Opsional)',
+          'cv' => 'Curriculum Vitae (CV)'
+        ];
+        @endphp
+        @foreach ($fields as $name => $label)
+        <div>
+          <label class="block text-md font-medium text-gray-700 mb-1" for="{{ $name }}">
+            {{ $label }} (PDF)
+            @if($name === 'sertifikat_gcp')
+              <span class="ml-1 text-blue-600 text-xs font-semibold align-middle">(Opsional)</span>
+            @else
+              <span class="ml-1 text-red-500 text-xs font-semibold align-middle">(Wajib diisi)</span>
+            @endif
+          </label>
+          <p class="text-xs text-gray-500 mb-1">
+            <span class="block mb-1">
+              <span class="font-semibold">Ketentuan:</span> File <span class="font-semibold text-blue-700">PDF</span>, maksimal <span class="font-semibold">10MB</span>
+            </span>
+          </p>
+          <div class="relative">
+            <input type="file" id="{{ $name }}" name="{{ $name }}" accept="application/pdf"
+              class="mt-1 block w-full text-sm text-gray-700 border border-gray-300 rounded-lg file:bg-blue-50 file:border-0 file:py-2 file:px-4 file:text-blue-600 file:font-semibold hover:file:bg-blue-100 @error($name) border-red-500 @enderror pr-10"
+              onchange="showFileProgressAndPreview(this)" 
+              @if($name !== 'sertifikat_gcp') @endif
+              oninput="validateFileInput(this)"
+              data-label="{{ $label }}"
+              data-max="10485760"
+            />
+            <div class="w-full h-2 bg-gray-200 rounded mt-2 overflow-hidden" id="progressbar-{{ $name }}" style="display:none;">
+              <div class="h-2 bg-blue-500 transition-all duration-300" style="width:0%"></div>
+            </div>
+            <div id="preview-{{ $name }}" class="mt-3 hidden"></div>
+            <span class="text-xs text-red-600 mt-1 block hidden" id="error-{{ $name }}"></span>
+            <span class="text-xs text-gray-500 mt-1 block hidden" id="size-{{ $name }}"></span>
           </div>
-          <div id="preview-{{ $name }}" class="mt-3 hidden"></div>
-          <span class="text-xs text-red-600 mt-1 block hidden" id="error-{{ $name }}"></span>
-          <span class="text-xs text-gray-500 mt-1 block hidden" id="size-{{ $name }}"></span>
+          @error($name)
+            <span class="text-xs text-red-600 mt-1 block">{{ $message }}</span>
+          @enderror
         </div>
-        @error($name)
-          <span class="text-xs text-red-600 mt-1 block">{{ $message }}</span>
-        @enderror
+        @endforeach
       </div>
-      @endforeach
+
+      <!-- Google Drive Link Section (hidden by default) -->
+      <div id="gdriveSection" style="display:none;">
+        <div>
+          <label for="gdrive_link" class="block text-md font-medium text-gray-700 mb-1">
+            Link Google Drive <span class="ml-1 text-red-500 text-xs font-semibold align-middle">(Wajib diisi jika memilih opsi ini)</span>
+          </label>
+          <p class="text-xs text-gray-500 mb-1">
+            <span class="block mb-1">
+              <span class="font-semibold">Ketentuan:</span> Link Google Drive harus dapat diakses publik (siapa saja yang memiliki link dapat melihat & mengunduh dokumen PDF yang diperlukan).
+            </span>
+            <span class="block">Pastikan seluruh dokumen sudah diunggah ke folder Google Drive dan <span class="font-semibold">izin akses sudah diatur</span>.</span>
+          </p>
+          <input type="url" id="gdrive_link" name="gdrive_link" class="mt-1 block w-full rounded-lg border-gray-300 bg-white shadow-sm h-10 focus:ring-blue-500 focus:border-blue-500 @error('gdrive_link') border-red-500 @enderror" placeholder="https://drive.google.com/..." />
+          <span class="text-xs text-red-600 mt-1 block hidden" id="error-gdrive_link"></span>
+          @error('gdrive_link')
+            <span class="text-xs text-red-600 mt-1 block">{{ $message }}</span>
+          @enderror
+        </div>
+      </div>
 
       <!-- Submit -->
       <div class="text-right">
@@ -233,7 +269,21 @@
     </form>
   </div>
 
+
   <script>
+    // Toggle between upload fields and gdrive link
+    function toggleSubmissionMode(mode) {
+      const uploadSection = document.getElementById('uploadFieldsSection');
+      const gdriveSection = document.getElementById('gdriveSection');
+      if (mode === 'gdrive') {
+        uploadSection.style.display = 'none';
+        gdriveSection.style.display = 'block';
+      } else {
+        uploadSection.style.display = 'block';
+        gdriveSection.style.display = 'none';
+      }
+    }
+
     // Simulate per-field progress bar and show PDF preview on file select
     function showFileProgressAndPreview(input) {
       const id = input.id;
@@ -329,6 +379,67 @@
         input.value = '';
         return;
       }
+    }
+
+    // Validate GDrive link (simple)
+    function validateGDriveLink() {
+      const input = document.getElementById('gdrive_link');
+      const error = document.getElementById('error-gdrive_link');
+      if (!input) return true;
+      error.textContent = '';
+      error.classList.add('hidden');
+      if (!input.value) {
+        error.textContent = 'Link Google Drive wajib diisi.';
+        error.classList.remove('hidden');
+        return false;
+      }
+      // Simple pattern check
+      if (!/^https:\/\/(drive|docs)\.google\.com\//.test(input.value)) {
+        error.textContent = 'Link harus berupa URL Google Drive yang valid.';
+        error.classList.remove('hidden');
+        return false;
+      }
+      return true;
+    }
+
+    // Overwrite form validation to support dual mode
+    function validateAllFileInputs(e) {
+      const mode = document.querySelector('input[name="submission_mode"]:checked').value;
+      let valid = true;
+      if (mode === 'upload') {
+        const form = document.getElementById('pengajuanForm');
+        const fileInputs = form.querySelectorAll('#uploadFieldsSection input[type="file"]');
+        fileInputs.forEach(input => {
+          validateFileInput(input);
+          const id = input.id;
+          const error = document.getElementById('error-' + id);
+          if (error && !error.classList.contains('hidden')) {
+            valid = false;
+          }
+        });
+        if (!valid) {
+          e.preventDefault();
+          // Scroll ke error pertama
+          const firstError = form.querySelector('span.text-red-600:not(.hidden)');
+          if (firstError) {
+            firstError.scrollIntoView({behavior: 'smooth', block: 'center'});
+          }
+          return false;
+        }
+        showLoadingUpload(e);
+        return true;
+      } else if (mode === 'gdrive') {
+        // Only validate gdrive link
+        if (!validateGDriveLink()) {
+          e.preventDefault();
+          const error = document.getElementById('error-gdrive_link');
+          if (error) error.scrollIntoView({behavior: 'smooth', block: 'center'});
+          return false;
+        }
+        showLoadingUpload(e);
+        return true;
+      }
+      return true;
     }
   </script>
 

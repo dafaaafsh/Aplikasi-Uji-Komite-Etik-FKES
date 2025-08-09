@@ -110,17 +110,113 @@
     <!-- STEP 1: Info Akun -->
     <div class="form-step" id="step-1">
       <label class="block text-sm mb-1 font-semibold text-blue-700">Email</label>
-      <input type="email" id="email" name="email" required class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-2 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50">
+      <input type="email" id="email" name="email" required class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-1 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50">
+      <div id="emailError" class="text-xs text-red-600 mb-2 hidden"></div>
 
       <label class="block text-sm mb-1 font-semibold text-blue-700">Kata Sandi</label>
-      <input type="password" id="password" name="password" minlength="6" required class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-2 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50">
+      <div class="relative">
+        <input type="password" id="password" name="password" minlength="6" required class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-1 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50 pr-10" oninput="checkPasswordStrength()">
+        <button type="button" tabindex="-1" onclick="togglePassword('password', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-700 focus:outline-none">
+          <svg id="icon-password" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+        </button>
+      </div>
+      <div class="text-xs text-gray-600 mb-1">Password minimal 6 karakter, mengandung huruf besar, angka, dan simbol untuk keamanan maksimal.</div>
+      <div id="passwordStrength" class="text-xs mb-1"></div>
+      <div id="passwordError" class="text-xs text-red-600 mb-2 hidden"></div>
 
       <label class="block text-sm mb-1 font-semibold text-blue-700">Konfirmasi Kata Sandi</label>
-      <input type="password" id="password_confirmation" name="password_confirmation" minlength="6" required class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 text-sm bg-blue-50">
+      <div class="relative">
+        <input type="password" id="password_confirmation" name="password_confirmation" minlength="6" required class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 text-sm bg-blue-50 pr-10" oninput="checkPasswordMatch()">
+        <button type="button" tabindex="-1" onclick="togglePassword('password_confirmation', this)" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-700 focus:outline-none">
+          <svg id="icon-password_confirmation" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+        </button>
+      </div>
+      <div id="passwordConfirmError" class="text-xs text-red-600 mb-2 hidden"></div>
+<script>
+function togglePassword(fieldId, btn) {
+  const input = document.getElementById(fieldId);
+  const icon = btn.querySelector('svg');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a9.956 9.956 0 012.293-3.95m3.362-2.568A9.956 9.956 0 0112 5c4.478 0 8.268 2.943 9.542 7a9.956 9.956 0 01-4.043 5.306M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18" />';
+  } else {
+    input.type = 'password';
+    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />';
+  }
+}
+</script>
 
       <div class="mt-5 flex justify-end">
         <button type="button" onclick="nextStep()" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white px-6 py-2 rounded-lg text-sm font-bold shadow hover:from-blue-700 hover:to-blue-500 transition">Next</button>
       </div>
+<script>
+// Password strength checker
+function checkPasswordStrength() {
+  const password = document.getElementById('password').value;
+  const strengthDiv = document.getElementById('passwordStrength');
+  let strength = 0;
+  if (password.length >= 6) strength++;
+  if (/[A-Z]/.test(password)) strength++;
+  if (/[0-9]/.test(password)) strength++;
+  if (/[^A-Za-z0-9]/.test(password)) strength++;
+  let status = '';
+  let color = '';
+  if (password.length === 0) {
+    status = '';
+  } else if (strength <= 1) {
+    status = 'Lemah';
+    color = 'text-red-600';
+  } else if (strength === 2 || strength === 3) {
+    status = 'Sedang';
+    color = 'text-yellow-600';
+  } else if (strength >= 4) {
+    status = 'Kuat';
+    color = 'text-green-600';
+  }
+  strengthDiv.textContent = status ? `Password: ${status}` : '';
+  strengthDiv.className = `text-xs mb-1 font-semibold ${color}`;
+}
+
+// Password match checker
+function checkPasswordMatch() {
+  const pass = document.getElementById('password').value;
+  const confirm = document.getElementById('password_confirmation').value;
+  const errorDiv = document.getElementById('passwordConfirmError');
+  if (confirm && pass !== confirm) {
+    errorDiv.textContent = 'Konfirmasi password tidak sama.';
+    errorDiv.classList.remove('hidden');
+  } else {
+    errorDiv.textContent = '';
+    errorDiv.classList.add('hidden');
+  }
+}
+
+// Real-time validation for email and password
+document.getElementById('email').addEventListener('input', function() {
+  const email = this.value;
+  const errorDiv = document.getElementById('emailError');
+  if (email && !/^\S+@\S+\.\S+$/.test(email)) {
+    errorDiv.textContent = 'Format email tidak valid.';
+    errorDiv.classList.remove('hidden');
+  } else {
+    errorDiv.textContent = '';
+    errorDiv.classList.add('hidden');
+  }
+});
+
+document.getElementById('password').addEventListener('input', function() {
+  const errorDiv = document.getElementById('passwordError');
+  if (this.value.length > 0 && this.value.length < 6) {
+    errorDiv.textContent = 'Password minimal 6 karakter.';
+    errorDiv.classList.remove('hidden');
+  } else {
+    errorDiv.textContent = '';
+    errorDiv.classList.add('hidden');
+  }
+});
+
+document.getElementById('password_confirmation').addEventListener('input', checkPasswordMatch);
+</script>
     </div>
 
     <!-- STEP 2: Info Diri -->

@@ -151,6 +151,7 @@ class PenelitiController extends Controller
         ]);
     }
 
+
     public function uploadBukti(Request $request){
         $validated = $request->validate([
             'protocol_id' => 'required',
@@ -337,70 +338,107 @@ class PenelitiController extends Controller
     }
 
     public function storeDocument(Request $request){
-        $request->validate([
+        $mode = $request->input('submission_mode', 'upload');
+        $rules = [
             'nomor_protokol' => 'required|exists:protocols,nomor_protokol',
-            'surat_permohonan' => 'required|mimes:pdf|max:12240',
-            'surat_institusi' => 'required|mimes:pdf|max:12240',
-            'protokol_etik' => 'required|mimes:pdf|max:12240',
-            'informed_consent' => 'required|mimes:pdf|max:12240',
-            'proposal_penelitian' => 'required|mimes:pdf|max:12240',
-            'cv' => 'required|mimes:pdf|max:12240',
-            'sertifikat_gcp' => 'nullable|mimes:pdf|max:12240',
-        ],[
-            'surat_permohonan' => 'Belum ada surat permohonan', 
-            'surat_institusi' => 'Belum ada surat institusi',
-            'protokol_etik' => 'Belum ada protokol etik',
-            'informed_consent' => 'Belum ada informed consent',
-            'proposal_penelitian' => 'Belum ada proposal penelitian',
-            'cv' => 'Belum ada cv ',
-        ]);
+        ];
+        $messages = [
+            'nomor_protokol.required' => 'Nomor protokol wajib diisi',
+            'nomor_protokol.exists' => 'Nomor protokol tidak valid',
+        ];
+
+        if ($mode === 'gdrive') {
+            $rules['gdrive_link'] = ['required', 'url', 'regex:/^https:\/\/(drive|docs)\.google\.com\//'];
+            $messages['gdrive_link.required'] = 'Link Google Drive wajib diisi';
+            $messages['gdrive_link.url'] = 'Link Google Drive tidak valid';
+            $messages['gdrive_link.regex'] = 'Link harus berupa URL Google Drive yang valid';
+        }
+        if ($mode === 'upload') {
+            $rules = array_merge($rules, [
+                'surat_permohonan' => 'required|mimes:pdf|max:12240',
+                'surat_institusi' => 'required|mimes:pdf|max:12240',
+                'protokol_etik' => 'required|mimes:pdf|max:12240',
+                'informed_consent' => 'required|mimes:pdf|max:12240',
+                'proposal_penelitian' => 'required|mimes:pdf|max:12240',
+                'cv' => 'required|mimes:pdf|max:12240',
+                'sertifikat_gcp' => 'nullable|mimes:pdf|max:12240',
+            ]);
+            $messages = array_merge($messages, [
+                'surat_permohonan.required' => 'Belum ada surat permohonan',
+                'surat_institusi.required' => 'Belum ada surat institusi',
+                'protokol_etik.required' => 'Belum ada protokol etik',
+                'informed_consent.required' => 'Belum ada informed consent',
+                'proposal_penelitian.required' => 'Belum ada proposal penelitian',
+                'cv.required' => 'Belum ada cv',
+            ]);
+        }
+
+        $request->validate($rules, $messages);
 
         $protocol = protocols::where('nomor_protokol', $request->nomor_protokol)->firstOrFail();
         $protocolId = $protocol->id;
-        $nomorProtocol= $protocol->nomor_protokol;
+        $nomorProtocol = $protocol->nomor_protokol;
 
-        $fields = [
-            'surat_permohonan',
-            'surat_institusi',
-            'protokol_etik',
-            'informed_consent',
-            'proposal_penelitian',
-            'sertifikat_gcp',
-            'cv'
-        ];
-
-        foreach ($fields as $field) {
-            if ($request->hasFile($field)) {
-        
-                $file = $request->file($field);
-                $filename = $field . '_' . time() . '.' . $file->getClientOriginalExtension();
-                $path = 'protokol/' . $nomorProtocol;
-        
-                $oldDoc = Document::where('protocol_id', $protocolId)
-                                  ->where('tipe_file', $field)
-                                  ->first();
-        
-                if ($oldDoc) {
-                    Storage::disk('local')->delete($path . $oldDoc->nama_file);
-                    $oldDoc->delete();
-                }
-        
-                Storage::disk('local')->putFileAs($path, $file, $filename);
-        
-                Document::create([
-                    'protocol_id' => $protocolId,
-                    'tipe_file' => $field,
-                    'nama_file' => $filename,
-                ]);
+        if ($mode === 'gdrive') {
+            // Simpan link Google Drive ke tabel documents (bukan protocols)
+            $protocol->tanggal_pengajuan = now();
+            $protocol->status_penelitian = 'Diperiksa';
+            $protocol->save();
+            // Hapus dokumen gdrive_link lama jika ada
+            $oldDoc = Document::where('protocol_id', $protocolId)
+                ->where('tipe_file', 'gdrive_link')
+                ->first();
+            if ($oldDoc) {
+                $oldDoc->delete();
             }
+            Document::create([
+                'protocol_id' => $protocolId,
+                'tipe_file' => 'gdrive_link',
+                'nama_file' => $request->gdrive_link,
+            ]);
+            return back()->with('success', 'Link Google Drive berhasil disimpan.');
+        } else {
+            $fields = [
+                'surat_permohonan',
+                'surat_institusi',
+                'protokol_etik',
+                'informed_consent',
+                'proposal_penelitian',
+                'sertifikat_gcp',
+                'cv'
+            ];
+            foreach ($fields as $field) {
+                if ($request->hasFile($field)) {
+                    $file = $request->file($field);
+                    $filename = $field . '_' . time() . '.' . $file->getClientOriginalExtension();
+                    $path = 'protokol/' . $nomorProtocol;
+                    $oldDoc = Document::where('protocol_id', $protocolId)
+                                      ->where('tipe_file', $field)
+                                      ->first();
+                    if ($oldDoc) {
+                        Storage::disk('local')->delete($path . $oldDoc->nama_file);
+                        $oldDoc->delete();
+                    }
+                    Storage::disk('local')->putFileAs($path, $file, $filename);
+                    Document::create([
+                        'protocol_id' => $protocolId,
+                        'tipe_file' => $field,
+                        'nama_file' => $filename,
+                    ]);
+                }
+            }
+            $protocol->tanggal_pengajuan = now();
+            $protocol->status_penelitian = 'Diperiksa';
+            // Hapus dokumen gdrive_link jika ada (jika sebelumnya pernah submit link)
+            $oldDoc = Document::where('protocol_id', $protocolId)
+                ->where('tipe_file', 'gdrive_link')
+                ->first();
+            if ($oldDoc) {
+                $oldDoc->delete();
+            }
+            $protocol->save();
+            return back()->with('success', 'Dokumen berhasil diupload dan dicatat di database.');
         }
-        
-
-        $protocol->update(['tanggal_pengajuan' => now()]);
-        $protocol->status_penelitian = 'Diperiksa';
-        $protocol->save();
-
-        return back()->with('success', 'Dokumen berhasil diupload dan dicatat di database.');
     }
 
     public function updateDocument(Request $request){
@@ -455,6 +493,59 @@ class PenelitiController extends Controller
     }
 
     
-}
+    // Endpoint: Get Google Drive link for a protocol (for penelitianSaya.blade.php)
+    public function getGDriveLink($id)
+    {
+        $doc = Document::where('protocol_id', $id)
+            ->where('tipe_file', 'gdrive_link')
+            ->first();
+        if ($doc) {
+            return response()->json(['gdrive_link' => $doc->nama_file]);
+        } else {
+            return response()->json(['gdrive_link' => null]);
+        }
+    }
 
-?>
+    // Endpoint: Update Google Drive link for a protocol (by peneliti)
+    public function updateGDriveLink(Request $request)
+    {
+        $request->validate([
+            'protocol_id' => 'required|exists:protocols,id',
+            'gdrive_link' => ['required', 'url', 'regex:/^https:\/\/(drive|docs)\.google\.com\//'],
+        ], [
+            'protocol_id.required' => 'ID protokol wajib diisi',
+            'protocol_id.exists' => 'ID protokol tidak valid',
+            'gdrive_link.required' => 'Link Google Drive wajib diisi',
+            'gdrive_link.url' => 'Link Google Drive tidak valid',
+            'gdrive_link.regex' => 'Link harus berupa URL Google Drive yang valid',
+        ]);
+
+        $protocolId = $request->protocol_id;
+        // Hapus dokumen gdrive_link lama jika ada
+        $oldDoc = Document::where('protocol_id', $protocolId)
+            ->where('tipe_file', 'gdrive_link')
+            ->first();
+        if ($oldDoc) {
+            $oldDoc->delete();
+        }
+
+        Document::create([
+            'protocol_id' => $protocolId,
+            'tipe_file' => 'gdrive_link',
+            'nama_file' => $request->gdrive_link,
+        ]);
+
+        // Update status pengajuan jika perlu
+        $protocol = protocols::find($protocolId);
+        if ($protocol) {
+            $protocol->tanggal_pengajuan = now();
+            $protocol->status_penelitian = 'Diperiksa';
+            // Hapus komentar jika ada
+            $protocol->komentar = null;
+            // Simpan perubahan
+            $protocol->save();
+        }
+
+        return response()->json(['success' => true, 'message' => 'Link Google Drive berhasil diperbarui.']);
+    }
+}

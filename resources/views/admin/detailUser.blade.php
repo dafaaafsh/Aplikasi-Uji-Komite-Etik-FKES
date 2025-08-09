@@ -3,7 +3,7 @@
 
     <div class="max-w-6xl mx-auto mt-8 bg-white rounded-xl shadow-lg p-6">
         <div class="flex items-center gap-6 mb-6">
-            <img src="{{ $user->avatar_path ? asset('storage/' . $user->avatar_path) : 'https://media.istockphoto.com/id/1330286085/vector/male-avatar-icon.jpg?s=612x612&w=is&k=20&c=U9zDXcxk0pkE6Yz0MtNOwW1LG1Njkzglx7Wtp16-ho4=' }}" alt="Avatar" class="w-24 h-24 rounded-full border shadow">
+            <img src="{{ $user->avatar_path ? asset('public/' . $user->avatar_path) : 'https://media.istockphoto.com/id/1330286085/vector/male-avatar-icon.jpg?s=612x612&w=is&k=20&c=U9zDXcxk0pkE6Yz0MtNOwW1LG1Njkzglx7Wtp16-ho4=' }}" alt="Avatar" class="w-24 h-24 rounded-full border shadow">
             <div>
                 <p class="text-lg font-semibold text-gray-800">{{ $user->name }}</p>
                 <p class="text-sm text-gray-500">{{ $user->email }}</p>
