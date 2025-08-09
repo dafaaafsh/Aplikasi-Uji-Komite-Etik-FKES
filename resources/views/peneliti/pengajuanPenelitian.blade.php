@@ -101,27 +101,6 @@
     </div>
   </div>
 
-    @if ($errors->any())
-        <div id="modalError" class="fixed flex inset-0 bg-black/70 bg-opacity-50 z-50 justify-center items-center">
-            <div class="bg-red-100 border border-red-800 rounded-lg shadow-lg w-full max-w-md p-6 h-fit max-h-md">
-
-                <div class="bg-red-100 text-red-800 px-4 py-2 rounded mb-4">
-                    <strong>Gagal menyimpan!</strong> Periksa kembali input Anda:
-                    <ul class="mt-2 list-disc list-inside text-sm">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>  
-
-                <div class="flex justify-end">
-                    <button type="button" onclick="tutupModalError()" class="px-4 py-2 rounded bg-gray-600 hover:bg-gray-700 text-white font-semibold">Tutup</button>
-                </div>
-
-            </div>
-        </div>
-    @endif
-
     @if (session('success'))
         <div id="modalSuccess" class="fixed flex inset-0 bg-black/70 bg-opacity-50 z-50 justify-center items-center">
             <div class="bg-green-100 border border-green-800 rounded-lg shadow-lg w-full max-w-md p-6 h-fit max-h-md">
@@ -142,22 +121,52 @@
   <!-- Form Pengajuan -->
   <div class="mt-12 bg-white rounded-xl shadow-xl p-8 max-w-3xl mx-auto">
     <h2 class="text-xl font-bold mb-6 text-gray-800">Form Pengajuan Penelitian</h2>
-    <form action="{{ route('pengajuan.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form id="pengajuanForm" action="{{ route('pengajuan.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6" onsubmit="return validateAllFileInputs(event)">
+  <script>
+    // Validasi semua file input sebelum submit form
+    function validateAllFileInputs(e) {
+      let valid = true;
+      const form = document.getElementById('pengajuanForm');
+      const fileInputs = form.querySelectorAll('input[type="file"]');
+      fileInputs.forEach(input => {
+        validateFileInput(input);
+        const id = input.id;
+        const error = document.getElementById('error-' + id);
+        if (error && !error.classList.contains('hidden')) {
+          valid = false;
+        }
+      });
+      if (!valid) {
+        e.preventDefault();
+        // Scroll ke error pertama
+        const firstError = form.querySelector('span.text-red-600:not(.hidden)');
+        if (firstError) {
+          firstError.scrollIntoView({behavior: 'smooth', block: 'center'});
+        }
+        return false;
+      }
+      showLoadingUpload(e);
+      return true;
+    }
+  </script>
       @csrf
 
       <!-- Nomor Protokol -->
       <div>
         <label for="nomor_protokol" class="block text-sm font-medium text-gray-700">Nomor Protokol</label>
         <select id="nomor_protokol" name="nomor_protokol" required
-          class="mt-1 block w-full rounded-lg border-gray-300 bg-white shadow-sm h-10 focus:ring-blue-500 focus:border-blue-500">
+          class="mt-1 block w-full rounded-lg border-gray-300 bg-white shadow-sm h-10 focus:ring-blue-500 focus:border-blue-500 @error('nomor_protokol') border-red-500 @enderror">
           <option value="">-- Pilih Nomor Protokol --</option>
           @foreach ($protocols as $item)
             @if (empty($item->tanggal_pengajuan) && !empty($item->nomor_protokol))
-              <option value="{{ $item->nomor_protokol }}">{{ $item->nomor_protokol_asli }} 
+              <option value="{{ $item->nomor_protokol }}" {{ old('nomor_protokol') == $item->nomor_protokol ? 'selected' : '' }}>{{ $item->nomor_protokol_asli }} 
               </option>
             @endif
           @endforeach
         </select>
+        @error('nomor_protokol')
+          <span class="text-xs text-red-600 mt-1 block">{{ $message }}</span>
+        @enderror
       </div>
 
       <!-- File Uploads -->
@@ -175,22 +184,153 @@
 
       @foreach ($fields as $name => $label)
       <div>
-        <label class="block text-sm font-medium text-gray-700">{{ $label }} (PDF)</label>
-        <input type="file" name="{{ $name }}" accept="application/pdf"
-          {{ $name !== 'sertifikat_gcp' ? '' : '' }}
-          class="mt-1 block w-full text-sm text-gray-700 border border-gray-300 rounded-lg file:bg-blue-50 file:border-0 file:py-2 file:px-4 file:text-blue-600 file:font-semibold hover:file:bg-blue-100" />
+        <label class="block text-md font-medium text-gray-700 mb-1" for="{{ $name }}">
+          {{ $label }} (PDF)
+          @if($name === 'sertifikat_gcp')
+            <span class="ml-1 text-blue-600 text-xs font-semibold align-middle">(Opsional)</span>
+          @else
+            <span class="ml-1 text-red-500 text-xs font-semibold align-middle">(Wajib diisi)</span>
+          @endif
+        </label>
+        <p class="text-xs text-gray-500 mb-1">
+          <span class="block mb-1">
+            <span class="font-semibold">Ketentuan:</span> File <span class="font-semibold text-blue-700">PDF</span>, maksimal <span class="font-semibold">10MB</span>
+          </span>
+        </p>
+        <div class="relative">
+          <input type="file" id="{{ $name }}" name="{{ $name }}" accept="application/pdf"
+            class="mt-1 block w-full text-sm text-gray-700 border border-gray-300 rounded-lg file:bg-blue-50 file:border-0 file:py-2 file:px-4 file:text-blue-600 file:font-semibold hover:file:bg-blue-100 @error($name) border-red-500 @enderror pr-10"
+            onchange="showFileProgressAndPreview(this)" 
+            @if($name !== 'sertifikat_gcp') @endif
+            oninput="validateFileInput(this)"
+            data-label="{{ $label }}"
+            data-max="10485760"
+          />
+          <div class="w-full h-2 bg-gray-200 rounded mt-2 overflow-hidden" id="progressbar-{{ $name }}" style="display:none;">
+            <div class="h-2 bg-blue-500 transition-all duration-300" style="width:0%"></div>
+          </div>
+          <div id="preview-{{ $name }}" class="mt-3 hidden"></div>
+          <span class="text-xs text-red-600 mt-1 block hidden" id="error-{{ $name }}"></span>
+          <span class="text-xs text-gray-500 mt-1 block hidden" id="size-{{ $name }}"></span>
+        </div>
+        @error($name)
+          <span class="text-xs text-red-600 mt-1 block">{{ $message }}</span>
+        @enderror
       </div>
       @endforeach
 
       <!-- Submit -->
       <div class="text-right">
-        <button type="submit"
-          class="inline-flex items-center px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
-          Kirim Pengajuan
+        <button id="submitBtn" type="submit"
+          class="inline-flex items-center px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all">
+          <span id="submitBtnText">Kirim Pengajuan</span>
+          <svg id="loadingSpinner" class="w-5 h-5 ml-2 hidden animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
         </button>
       </div>
     </form>
   </div>
+
+  <script>
+    // Simulate per-field progress bar and show PDF preview on file select
+    function showFileProgressAndPreview(input) {
+      const id = input.id;
+      const barWrap = document.getElementById('progressbar-' + id);
+      const preview = document.getElementById('preview-' + id);
+      const error = document.getElementById('error-' + id);
+      if (!barWrap) return;
+      const bar = barWrap.querySelector('div');
+      bar.style.width = '0%';
+      barWrap.style.display = 'block';
+      if (preview) preview.classList.add('hidden');
+      if (error) error.classList.add('hidden');
+      // Show file size if selected
+      const sizeInfo = document.getElementById('size-' + id);
+      if (sizeInfo) {
+        if (input.files && input.files[0]) {
+          sizeInfo.textContent = 'Ukuran file: ' + formatBytes(input.files[0].size);
+          sizeInfo.classList.remove('hidden');
+        } else {
+          sizeInfo.textContent = '';
+          sizeInfo.classList.add('hidden');
+        }
+      }
+      let progress = 0;
+      bar.style.transition = 'none';
+      function animate() {
+        progress += Math.random() * 30 + 20;
+        if (progress >= 100) progress = 100;
+        bar.style.width = progress + '%';
+        bar.style.transition = 'width 0.3s';
+        if (progress < 100) {
+          setTimeout(animate, 200);
+        } else {
+          setTimeout(() => { barWrap.style.display = 'none'; }, 600);
+          // PDF preview & validation
+          validateFileInput(input);
+          if (input.files && input.files[0] && input.files[0].type === 'application/pdf') {
+            const file = input.files[0];
+            const url = URL.createObjectURL(file);
+            if (preview) {
+              preview.innerHTML = `<iframe src='${url}#toolbar=0&navpanes=0&scrollbar=0' class='w-full rounded border border-gray-200' style='height:340px;'></iframe>`;
+              preview.classList.remove('hidden');
+            }
+          } else if (preview) {
+            preview.innerHTML = '';
+            preview.classList.add('hidden');
+          }
+        }
+      }
+      animate();
+    }
+
+    // Format bytes to readable size
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Client-side validation sesuai rules controller
+    function validateFileInput(input) {
+      const id = input.id;
+      const error = document.getElementById('error-' + id);
+      if (!error) return;
+      error.textContent = '';
+      error.classList.add('hidden');
+      const file = input.files[0];
+      const label = input.getAttribute('data-label') || 'File';
+      const max = parseInt(input.getAttribute('data-max') || '10485760');
+      // Show file size info
+      const sizeInfo = document.getElementById('size-' + id);
+      if (sizeInfo) {
+        if (file) {
+          sizeInfo.textContent = 'Ukuran file: ' + formatBytes(file.size);
+          sizeInfo.classList.remove('hidden');
+        } else {
+          sizeInfo.textContent = '';
+          sizeInfo.classList.add('hidden');
+        }
+      }
+      if (!file) return;
+      if (file.type !== 'application/pdf') {
+        error.textContent = label + ' harus berupa file PDF';
+        error.classList.remove('hidden');
+        input.value = '';
+        return;
+      }
+      if (file.size > max) {
+        error.textContent = label + ' maksimal 10MB';
+        error.classList.remove('hidden');
+        input.value = '';
+        return;
+      }
+    }
+  </script>
 
   <script>
     function tutupModalError() {

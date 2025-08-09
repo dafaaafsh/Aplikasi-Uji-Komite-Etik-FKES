@@ -87,12 +87,12 @@
                   $profil = Auth::user();
               @endphp
 
-              <a href="../Admin/profil" class="hover:text-blue-950">
+              <a href="{{route('admin.profil')}}" class="hover:text-blue-950">
                   <p class="text-lg font-bold">Hai, {{ $profil->name }}</p>
                   <p class="text-sm font-light">masuk profil</p>
               </a>
           </div>
-          <a href="../Admin/profil">
+          <a href="{{route('admin.profil')}}">
             <img 
               @if (!empty($profil->avatar_path))
                   src="{{ asset("public/" . $profil->avatar_path) }}"

@@ -104,14 +104,18 @@
                 @else 
                   @if (empty($item->tarif))
                     <span class="text-gray-500 italic">Belum ditentukan</span>
-                  @else
-                    <a onclick="openDetail({{$item->id}})" class="hover:underline">Perlu Dibayar</a>
+                    @else
+                    @if ($item->status_pembayaran == 'Diperiksa')
+                      <span class="text-blue-500">Diperiksa</span>
+                    @else
+                      <a onclick="openDetail({{$item->id}})" class="hover:underline">Perlu Dibayar</a>
+                    @endif
                   @endif
                 @endif
                 <td class="px-6 py-4">
                   <div class="flex gap-3">
                     {{-- Tombol Upload Bukti Pembayaran --}}
-                    @if (empty($item->verified_pembayaran))
+                    @if (empty($item->verified_pembayaran) && !empty($item->tarif) && $item->status_pembayaran !== 'Diperiksa')
                     <button 
                       onclick="openUploadBukti({{ $item->id }})"
                       class="px-4 py-1 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-sm flex items-center gap-1"
@@ -309,7 +313,6 @@
       <p class="text-sm text-gray-700 mb-1"><strong>Jumlah Pembayaran:</strong> <span id="tarif"></span></p>
     </div>
 
-    
     <div class="mt-4" id="paymentInfo">
       <hr class="mt-6 mb-4 border-gray-500">
       <h2 class="text-xl font-bold text-gray-800 mb-3">Informasi Pembayaran</h2>

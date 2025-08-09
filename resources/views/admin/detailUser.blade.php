@@ -25,7 +25,8 @@
                         @if (Str::endsWith($user->ktp_path, '.pdf'))
                             <a href="/private/{{ $user->ktp_path }}" target="_blank" class="text-blue-600 underline">Lihat File PDF</a>
                         @else
-                            <img src="/private/{{ $user->ktp_path }}" alt="KTP" class="w-40 rounded border shadow">
+                            <img src="/private/{{ $user->ktp_path }}" alt="KTP" class="w-40 rounded border shadow transition-transform duration-300 hover:scale-105 hover:shadow-2xl hover:border-blue-400 cursor-pointer">
+                            <button type="button" onclick="window.open('/private/{{ $user->ktp_path }}', '_blank')" class="block mt-2 px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-xs font-semibold transition-all duration-200">Lihat KTP</button>
                         @endif
                     </div>
                     <div>
@@ -42,10 +43,10 @@
                                     <input type="hidden" name="email" value="{{ $user->email }}">
                                     <input type="hidden" name="role" value="{{ $user->role }}">
                                     <input type="hidden" name="verif_ktp" value="1">
-                                    <button type="submit" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs">Verifikasi KTP</button>
+                                    <button type="submit" class="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-xs transition-transform duration-200 hover:scale-105 hover:shadow">Verifikasi KTP</button>
                                 </form>
                                 <!-- Kembalikan KTP (open modal) -->
-                                <button type="button" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs" data-modal-target="#modalKembalikanKTP">Kembalikan KTP</button>
+                                <button type="button" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs transition-transform duration-200 hover:scale-105 hover:shadow" data-modal-target="#modalKembalikanKTP">Kembalikan KTP</button>
                             </div>
                         @endif
                     </div>

@@ -235,32 +235,6 @@ class PenelitiController extends Controller
 
         // Redirect dengan pesan sukses
         return redirect()->back()->with('success', 'Data berhasil diperbarui.');
-
-        // $validated = $request->validate([
-        //     'nama' => 'required|string|max:255',
-        //     'hp' => 'nullable|string|max:20',
-        //     'alamat' => 'nullable|string',
-        //     'institusi' => 'nullable|string|max:255',
-        //     'status' => 'nullable|string',
-        //     'asal' => 'nullable|string',
-        // ]);
-
-        // // Ambil data user
-        // $user = User::findOrFail($request['id']);
-
-        // // Update data user
-        // $user->name = $validated['nama'];
-        // $user->nomor_hp = $validated['hp'] ?? null;
-        // $user->alamat = $validated['alamat'] ?? null;
-        // $user->institusi = $validated['institusi'] ?? null;
-        // $user->status_peneliti = $validated['status'] ?? null;
-        // $user->asal_peneliti = $validated['asal'] ?? null;
-
-        // $user->save();
-
-        // // Redirect dengan pesan sukses
-        // return redirect()->back()->with('success', 'Data berhasil diperbarui.');
-
     }
 
     public function uploadAvatar(Request $request){
@@ -365,20 +339,20 @@ class PenelitiController extends Controller
     public function storeDocument(Request $request){
         $request->validate([
             'nomor_protokol' => 'required|exists:protocols,nomor_protokol',
-            'surat_permohonan' => 'required|mimes:pdf|max:5120',
-            'surat_institusi' => 'required|mimes:pdf|max:5120',
-            'protokol_etik' => 'required|mimes:pdf|max:5120',
-            'informed_consent' => 'required|mimes:pdf|max:5120',
-            'proposal_penelitian' => 'required|mimes:pdf|max:5120',
-            'cv' => 'required|mimes:pdf|max:5120',
-            'sertifikat_gcp' => 'nullable|mimes:pdf|max:5120',
+            'surat_permohonan' => 'required|mimes:pdf|max:12240',
+            'surat_institusi' => 'required|mimes:pdf|max:12240',
+            'protokol_etik' => 'required|mimes:pdf|max:12240',
+            'informed_consent' => 'required|mimes:pdf|max:12240',
+            'proposal_penelitian' => 'required|mimes:pdf|max:12240',
+            'cv' => 'required|mimes:pdf|max:12240',
+            'sertifikat_gcp' => 'nullable|mimes:pdf|max:12240',
         ],[
             'surat_permohonan' => 'Belum ada surat permohonan', 
             'surat_institusi' => 'Belum ada surat institusi',
             'protokol_etik' => 'Belum ada protokol etik',
             'informed_consent' => 'Belum ada informed consent',
             'proposal_penelitian' => 'Belum ada proposal penelitian',
-            'cv' => 'Belum ada cv '
+            'cv' => 'Belum ada cv ',
         ]);
 
         $protocol = protocols::where('nomor_protokol', $request->nomor_protokol)->firstOrFail();

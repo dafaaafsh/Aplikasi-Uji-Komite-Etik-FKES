@@ -202,7 +202,7 @@
             </p>
             <p class="flex gap-3 items-center mb-4 text-sm text-gray-800">
                 <strong>Bukti Pembayaran :</strong>
-                <a href="" id="path_link" class="text-blue-700 hover:underline">Lihat bukti pembayaran disini</a>
+                <a href="" id="path_link" target="_blank" class="text-blue-700 hover:underline">Lihat bukti pembayaran disini</a>
             </p>
 
             <div class="flex justify-between">
