@@ -25,7 +25,7 @@ class RoleMiddleware
         if (!in_array($user->role, $roles)) {
             return match ($user->role){
                 'Peneliti' => redirect('peneliti/dashboard'),
-                'Admin' => redirect('admin/dashboard'),
+                'Administrator' => redirect('admin/dashboard'),
                 'Kepk' => redirect('kepk/dashboard'),
                 'Penguji' => redirect('penguji/dashboard'),
                 default => redirect('/')

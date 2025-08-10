@@ -38,7 +38,7 @@
                                 <select name="role" id="role" onchange="this.form.submit()" class="px-1 py-1 border border-gray-500 rounded-xl text-sm focus:ring focus:ring-blue-900">
                                     <option value="" {{ request('role') === '' ? 'selected' : '' }}>Semua</option>
                                     <option value="Peneliti" {{ request('role') === 'Peneliti' ? 'selected' : '' }}>Peneliti</option>
-                                    <option value="Admin" {{ request('role') === 'Admin' ? 'selected' : '' }}>Admin</option>
+                                    <option value="Administrator" {{ request('role') === 'Administrator' ? 'selected' : '' }}>Administrator</option>
                                     <option value="Penguji" {{ request('role') === 'Penguji' ? 'selected' : '' }}>Penguji</option>
                                     <option value="Kepk">Kepk</option>
                                 </select>
@@ -130,7 +130,7 @@
                 <select name="role" id="role" required
                     class="mt-1 w-full rounded-md border-gray-600 border shadow-sm focus:ring focus:ring-blue-200">
                     <option value="">-- Pilih Role --</option>
-                    <option value="Admin">Admin</option>
+                    <option value="Administrator">Administrator</option>
                     <option value="Penguji">Penguji</option>
                     <option value="Kepk">Kepk</option>
                     <option value="Peneliti">Peneliti</option>

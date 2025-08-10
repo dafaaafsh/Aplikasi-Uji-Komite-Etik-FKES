@@ -13,49 +13,85 @@ class DummySeederUsers extends Seeder
      */
     public function run(): void
     {
+        $faker = \Faker\Factory::create('id_ID');
         $userData = [
+            // Peneliti
             [
-                'name' => 'Peneliti Pertama',
-                'email' => 'peneliti1@gmail.com',
+                'name' => $faker->name,
+                'email' => 'peneliti@gmail.com',
                 'role' => 'Peneliti',
-                'password' => bcrypt('123456'),
+                'password' => bcrypt('password'),
                 'email_verified_at' => now(),
-            ],[
-                'name' => 'Peneliti Kedua',
-                'email' => 'peneliti2@gmail.com',
-                'role' => 'Peneliti',
-                'password' => bcrypt('123456'),
+                'nomor_hp' => $faker->phoneNumber,
+                'alamat' => $faker->address,
+                'institusi' => $faker->company,
+                'status_peneliti' => 'Mahasiswa (S1)',
+                'asal_peneliti' => 'Eksternal',
+            ],
+            // Administrator
+            [
+                'name' => $faker->name,
+                'email' => 'administrator@gmail.com',
+                'role' => 'Administrator',
+                'password' => bcrypt('password'),
                 'email_verified_at' => now(),
-            ],[
-                'name' => 'Admin Pertama',
-                'email' => 'admin1@gmail.com',
-                'role' => 'Admin',
-                'password' => bcrypt('123456'),
-                'email_verified_at' => now(),
-            ],[
-                'name' => 'Penguji Pertama',
+                'nomor_hp' => $faker->phoneNumber,
+                'alamat' => $faker->address,
+                'institusi' => $faker->company,
+                'status_peneliti' => 'Dosen',
+                'asal_peneliti' => 'UNUJA',
+            ],
+            // Penguji 1
+            [
+                'name' => $faker->name,
                 'email' => 'penguji@gmail.com',
                 'role' => 'Penguji',
-                'password' => bcrypt('123456'),
+                'password' => bcrypt('password'),
                 'email_verified_at' => now(),
-            ],[
-                'name' => 'Penguji Kedua',
+                'nomor_hp' => $faker->phoneNumber,
+                'alamat' => $faker->address,
+                'institusi' => $faker->company,
+                'status_peneliti' => 'Dosen',
+                'asal_peneliti' => 'UNUJA',
+            ],
+            // Penguji 2
+            [
+                'name' => $faker->name,
                 'email' => 'penguji2@gmail.com',
                 'role' => 'Penguji',
-                'password' => bcrypt('123456'),
+                'password' => bcrypt('password'),
                 'email_verified_at' => now(),
-            ],[
-                'name' => 'Penguji Ketiga',
+                'nomor_hp' => $faker->phoneNumber,
+                'alamat' => $faker->address,
+                'institusi' => $faker->company,
+                'status_peneliti' => 'Dosen',
+                'asal_peneliti' => 'UNUJA',
+            ],
+            // Penguji 3
+            [
+                'name' => $faker->name,
                 'email' => 'penguji3@gmail.com',
                 'role' => 'Penguji',
-                'password' => bcrypt('123456'),
+                'password' => bcrypt('password'),
                 'email_verified_at' => now(),
-            ],[
-                'name' => 'Kepk',
+                'nomor_hp' => $faker->phoneNumber,
+                'alamat' => $faker->address,
+                'institusi' => $faker->company,
+                'status_peneliti' => 'Dosen',
+                'asal_peneliti' => 'UNUJA',
+            ],
+            // Kepk
+            [
+                'name' => $faker->name,
                 'email' => 'kepk@gmail.com',
                 'role' => 'Kepk',
-                'password' => bcrypt('123456'),
+                'password' => bcrypt('password'),
                 'email_verified_at' => now(),
+                'nomor_hp' => $faker->phoneNumber,
+                'alamat' => $faker->address,
+                'institusi' => $faker->company,
+                'status_peneliti' => 'Dosen',
+                'asal_peneliti' => 'UNUJA',
             ],
         ];
 

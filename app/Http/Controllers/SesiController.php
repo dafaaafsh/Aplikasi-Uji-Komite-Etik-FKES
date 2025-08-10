@@ -29,7 +29,7 @@ class SesiController extends Controller
             $role = auth::user()->role;
             if ($role === 'Peneliti') {
                 return redirect('/peneliti/dashboard');
-            }elseif ($role === 'Admin') {
+            }elseif ($role === 'Administrator') {
                 return redirect('/admin/dashboard');
             }elseif ($role === 'Kepk'){
                 return redirect ('/kepk/dashboard');

@@ -32,7 +32,7 @@ class AdminController extends Controller
         ];
 
         return view('admin/dashboard', [
-            'title' => 'Dashboard Admin',
+            'title' => 'Dashboard Administrator',
             'protocols' => $protocols,
             'data' => $data,
             'baru' => $protocolsBaru,
@@ -43,7 +43,7 @@ class AdminController extends Controller
         $user = Auth::user();
 
         return view('admin/profil', [
-            'title' => 'Profil Admin',
+            'title' => 'Profil Administrator',
             'user' => $user
         ]);
     }
@@ -288,7 +288,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'role' => 'required|in:Admin,Penguji,Kepk,Peneliti',
+            'role' => 'required|in:Administrator,Penguji,Kepk,Peneliti',
         ]);
 
         User::create([
@@ -316,7 +316,7 @@ class AdminController extends Controller
             'id' => 'required|exists:users,id',
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email,' . $request->id,
-            'role' => 'required|in:Admin,Penguji,Kepk,Peneliti',
+            'role' => 'required|in:Administrator,Penguji,Kepk,Peneliti',
         ]);
 
         $user = User::findOrFail($validated['id']);
@@ -335,6 +335,14 @@ class AdminController extends Controller
             $user->ktp_reject_reason = null;
             $user->save();
             return redirect()->route('admin.users.detail', $user->id)->with('success', 'KTP berhasil diverifikasi.');
+        }
+
+        if ($request->has('reset_afiliasi')) {
+            $user->status_peneliti = null;
+            $user->institusi = null;
+            $user->asal_peneliti = null;
+            $user->save();
+            return redirect()->route('admin.users.detail', $user->id)->with('success', 'Afiliasi berhasil direset.');
         }
 
         // Kembalikan KTP

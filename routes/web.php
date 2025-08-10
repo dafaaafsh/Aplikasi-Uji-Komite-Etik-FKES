@@ -16,6 +16,7 @@ use App\Http\Controllers\PasswordController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 // Halaman umum
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/logout', [SesiController::class,'logout'])->name('logout');    
 
@@ -56,14 +57,14 @@ Route::middleware(['auth', RoleMiddleware::class . ':Peneliti'])->group(function
         Route::get('/peneliti/penelitian/gdrive-link/{id}', [PenelitiController::class, 'getGDriveLink'])->name('peneliti.penelitian.gdrive-link');
     });
     
-    Route::get('/Peneliti/profil', [PenelitiController::class, 'profil'])->name('peneliti.profil');
+    Route::get('/Peneliti/profil', [PenelitiController::class, 'profil'])->name('Peneliti.profil');
     Route::post('Peneliti/profil/update',[PenelitiController::class, 'updateData'])->name('peneliti.profil.update');
     Route::post('Peneliti/profil/uploadImage',[PenelitiController::class, 'uploadAvatar'])->name('peneliti.profil.uploadAvatar');
     Route::get('/peneliti/tentangKami', [HomeController::class,'tentang'])->name('tentang.kami');
 });
 
 // Admin
-Route::middleware(['auth', RoleMiddleware::class . ':Admin'])->group(function () {
+Route::middleware(['auth', RoleMiddleware::class . ':Administrator'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/kelolaUser', [AdminController::class, 'kelolaUser'])->name('admin.kelolaUser');
     Route::post('/admin/users/store', [AdminController::class, 'storeUser'])->name('admin.users.store');
@@ -91,7 +92,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':Admin'])->group(function ()
         Route::post('/admin/suratLulus/store', [AdminController::class, 'storeSurat'])->name('admin.surat-lulus.store');
     });
 
-    Route::get('/Admin/profil', [AdminController::class, 'profil'])->name('admin.profil');
+    Route::get('/Admin/profil', [AdminController::class, 'profil'])->name('Administrator.profil');
     Route::post('Admin/profil/update',[PenelitiController::class, 'updateData'])->name('admin.profil.update');
     Route::post('Admin/profil/uploadImage',[PenelitiController::class, 'uploadAvatar'])->name('admin.profil.uploadAvatar');
 });
@@ -112,7 +113,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':Kepk'])->group(function () 
         Route::post('/kepk/telaahAkhir/keputusan', [KeputusanController::class, 'store'])->name('kepk.keputusan.store');
     });
 
-    route::get('/Kepk/profil', [kepkController::class,'profil'])->name('kepk.profil');
+    route::get('/Kepk/profil', [kepkController::class,'profil'])->name('Kepk.profil');
     Route::post('Kepk/profil/update',[PenelitiController::class, 'updateData'])->name('kepk.profil.update');
     Route::post('Kepk/profil/uploadImage',[PenelitiController::class, 'uploadAvatar'])->name('kepk.profil.uploadAvatar');
 });
@@ -129,7 +130,7 @@ Route::middleware(['auth', RoleMiddleware::class . ':Penguji'])->group(function 
         Route::post('/penguji/review/{protokol}', [ReviewController::class, 'store'])->name('review.store');
     });
 
-    Route::get('/Penguji/profil', [PengujiController::class,'profil'])->name('kepk.profil');
+    Route::get('/Penguji/profil', [PengujiController::class,'profil'])->name('Penguji.profil');
     Route::post('Penguji/profil/update',[PenelitiController::class, 'updateData'])->name('penguji.profil.update');
     Route::post('Penguji/profil/uploadImage',[PenelitiController::class, 'uploadAvatar'])->name('penguji.profil.uploadAvatar');
 });

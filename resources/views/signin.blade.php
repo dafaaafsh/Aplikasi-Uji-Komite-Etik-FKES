@@ -146,7 +146,7 @@
     <!-- STEP 2: Info Diri -->
     <div class="form-step hidden" id="step-2">
       <label class="block text-sm mb-1 font-semibold text-blue-700">Nama Lengkap</label>
-      <input type="text" id="name" name="name" required placeholder="Nama lengkap sesuai KTP" class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-2 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50">
+      <input type="text" id="name" name="name" required placeholder="Nama lengkap sesuai KTP" class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-2 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50" pattern="^[A-Za-zÀ-ÿ ']+$" title="Nama hanya boleh berisi huruf dan spasi" oninput="this.value=this.value.replace(/[^A-Za-zÀ-ÿ ']/g,'')">
 
       <label class="block text-sm mb-1 font-semibold text-blue-700">No HP</label>
       <input type="tel" id="nohp" name="nohp" required pattern="[0-9]{10,15}" placeholder="08xxxxxxxxxx" class="w-full border-2 border-blue-100 rounded-lg px-3 py-2 mb-2 text-sm focus:ring-2 focus:ring-blue-400 bg-blue-50">
@@ -404,11 +404,17 @@ ktpInput.addEventListener('change', function(e) {
   const file = e.target.files[0];
   ktpFileName.textContent = file ? `File terpilih: ${file.name}` : '';
   ktpPreviewContainer.innerHTML = '';
-  if (!file) return;
+  const nextBtn = document.querySelector('#step-4 button[onclick="nextStep()"]');
+  if (!file) {
+    if (nextBtn) nextBtn.disabled = false;
+    return;
+  }
   ktpLoading.classList.remove('hidden');
+  if (nextBtn) nextBtn.disabled = true;
   // Simulasi loading lebih lama (2.5 detik)
   setTimeout(() => {
     ktpLoading.classList.add('hidden');
+    if (nextBtn) nextBtn.disabled = false;
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = function(ev) {

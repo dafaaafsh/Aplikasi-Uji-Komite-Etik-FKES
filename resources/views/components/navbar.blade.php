@@ -10,14 +10,16 @@
 
                 @php
                     $profil = Auth::user();
+                    $role = $profil->role;
+                    $route = $profil->role . '.profil';
                 @endphp
 
-                <a href="../{{ $profil->role }}/profil">
-                    <p class="text-sm font-medium text-white text-right"><span class="pr-2 text-yellow-400">({{ $profil->role }})</span>{{ $profil->name }}</span>
+                <a href="{{route($route)}}">
+                    <p class="text-sm font-medium text-white text-right"><span class="pr-2 text-yellow-400">({{ $role }})</span>{{ $profil->name }}</span>
                     <p class="text-sm font-light text-white text-right">{{ $profil->email }}</p>
                 </a>
             </div>
-            <a href="../{{ $profil->role }}/profil">
+            <a href="{{ route($route) }}">
                 <img 
                 @if (!empty($profil->avatar_path))
                     src="{{ asset("public/". $profil->avatar_path )}}"

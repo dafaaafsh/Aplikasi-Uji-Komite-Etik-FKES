@@ -6,7 +6,7 @@
     {{-- Deskripsi Halaman --}}
     <p class="mt-2 text-gray-600 text-base">
         Hari ini: <span class="font-medium text-gray-800">{{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}</span><br>
-        Selamat datang kembali, <span class="font-semibold text-gray-800">Admin</span>.  
+        Selamat datang kembali, <span class="font-semibold text-gray-800">Administrator</span>.  
         Pantau statistik pengajuan dan status pembayaran secara real-time di bawah ini.
     </p>
 

@@ -88,33 +88,67 @@
                 <dl class="divide-y divide-blue-100">
                     <div class="flex flex-col md:flex-row md:items-center md:gap-0 gap-1 px-6 py-3">
                         <dt class="w-48 font-semibold text-blue-700">Nomor Handphone</dt>
-                        <dd class="flex-1 text-gray-900">{{ $user->nomor_hp ?? '-' }}</dd>
+                        <dd class="flex-1 {{ empty($user->nomor_hp) ? 'text-gray-400 text-sm' : 'text-gray-900' }}">
+                            {{ $user->nomor_hp ?: 'Belum diisi' }}
+                        </dd>
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center md:gap-0 gap-1 px-6 py-3">
                         <dt class="w-48 font-semibold text-blue-700">Alamat</dt>
-                        <dd class="flex-1 text-gray-900">{{ $user->alamat ?? '-' }}</dd>
+                        <dd class="flex-1 {{ empty($user->alamat) ? 'text-gray-400 text-sm' : 'text-gray-900' }}">
+                            {{ $user->alamat ?: 'Belum diisi' }}
+                        </dd>
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center md:gap-0 gap-1 px-6 py-3">
                         <dt class="w-48 font-semibold text-blue-700">Institusi</dt>
-                        <dd class="flex-1 text-gray-900">{{ $user->institusi ?? '-' }}</dd>
+                        <dd class="flex-1 {{ empty($user->institusi) ? 'text-gray-400 text-sm' : 'text-gray-900' }}">
+                            {{ $user->institusi ?: 'Belum diisi' }}
+                        </dd>
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center md:gap-0 gap-1 px-6 py-3">
                         <dt class="w-48 font-semibold text-blue-700">Status Peneliti</dt>
-                        <dd class="flex-1 text-gray-900">{{ $user->status_peneliti ?? '-' }}</dd>
+                        <dd class="flex-1 {{ empty($user->status_peneliti) ? 'text-gray-400 text-sm' : 'text-gray-900' }}">
+                            {{ $user->status_peneliti ?: 'Belum diisi' }}
+                        </dd>
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center md:gap-0 gap-1 px-6 py-3">
                         <dt class="w-48 font-semibold text-blue-700">Asal Peneliti</dt>
-                        <dd class="flex-1 text-gray-900">{{ $user->asal_peneliti ?? '-' }}</dd>
+                        <dd class="flex-1 {{ empty($user->asal_peneliti) ? 'text-gray-400 text-sm' : 'text-gray-900' }}">
+                            {{ $user->asal_peneliti ?: 'Belum diisi' }}
+                        </dd>
                     </div>
                 </dl>
             </div>
         </div>
+
         <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mt-6">
             <div class="flex gap-2">
                 <!-- Edit User Button -->
                 <button type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded" data-modal-target="#modalEditUser">Edit</button>
                 <!-- Delete User Button -->
                 <button type="button" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded" data-modal-target="#modalDeleteUser">Hapus</button>
+                <!-- Reset Afiliasi Button (open modal) -->
+                <button type="button" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded" title="Reset data afiliasi user" data-modal-target="#modalResetAfiliasi">Reset Afiliasi</button>
+        <!-- Modal Reset Afiliasi -->
+        <div id="modalResetAfiliasi" class="fixed inset-0 z-50 hidden bg-black/40 flex items-center justify-center">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+                <h3 class="text-lg font-bold mb-4 text-yellow-700">Reset Data Afiliasi</h3>
+                <p class="mb-4 text-gray-700">Apakah Anda yakin ingin mereset data afiliasi user <span class="font-semibold">{{ $user->name }}</span>?<br>
+                <span class="text-sm text-gray-500">Data institusi, status peneliti, dan asal peneliti akan dikosongkan.</span></p>
+                <form action="{{ route('admin.updateUser') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="id" value="{{ $user->id }}">
+                    <input type="hidden" name="name" value="{{ $user->name }}">
+                    <input type="hidden" name="email" value="{{ $user->email }}">
+                    <input type="hidden" name="role" value="{{ $user->role }}">
+                    <input type="hidden" name="reset_afiliasi" value="1">
+                    <div class="flex justify-end gap-2 mt-4">
+                        <button type="button" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded" onclick="closeModal('modalResetAfiliasi')">Batal</button>
+                        <button type="submit" class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded">Reset</button>
+                    </div>
+                </form>
+                <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onclick="closeModal('modalResetAfiliasi')">&times;</button>
+            </div>
+        </div>
             </div>
             <a href="{{ route('admin.kelolaUser') }}" class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded">Kembali</a>
         </div>
@@ -137,7 +171,7 @@
                     <div class="mb-3">
                         <label class="block text-sm font-medium mb-1">Role</label>
                         <select name="role" class="w-full border rounded px-3 py-2" required>
-                            <option value="Admin" @if($user->role=='Admin') selected @endif>Admin</option>
+                            <option value="Administrator" @if($user->role=='Administrator') selected @endif>Administrator</option>
                             <option value="Penguji" @if($user->role=='Penguji') selected @endif>Penguji</option>
                             <option value="Kepk" @if($user->role=='Kepk') selected @endif>Kepk</option>
                             <option value="Peneliti" @if($user->role=='Peneliti') selected @endif>Peneliti</option>
@@ -153,7 +187,7 @@
         </div>
 
         <!-- Modal Delete User -->
-        <div id="modalDeleteUser" class="fixed inset-0 z-50 hidden bg-black bg-opacity-40 flex items-center justify-center">
+        <div id="modalDeleteUser" class="fixed inset-0 z-50 hidden bg-black/40 flex items-center justify-center">
             <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
                 <h3 class="text-lg font-bold mb-4 text-red-700">Hapus User</h3>
                 <p class="mb-4">Apakah Anda yakin ingin menghapus user <span class="font-semibold">{{ $user->name }}</span>?</p>
@@ -168,6 +202,76 @@
                 <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onclick="closeModal('modalDeleteUser')">&times;</button>
             </div>
         </div>
+
+        @if(session('success'))
+            <style>
+            @keyframes modalFadeIn {
+                0% { opacity: 0; transform: translateY(40px) scale(0.95); }
+                100% { opacity: 1; transform: translateY(0) scale(1); }
+            }
+            @keyframes modalFadeOut {
+                0% { opacity: 1; transform: translateY(0) scale(1); }
+                100% { opacity: 0; transform: translateY(40px) scale(0.95); }
+            }
+            .modal-animate-in {
+                animation: modalFadeIn 0.5s cubic-bezier(0.4,0,0.2,1);
+            }
+            .modal-animate-out {
+                animation: modalFadeOut 0.4s cubic-bezier(0.4,0,0.2,1) forwards;
+            }
+            </style>
+            <div id="modalSuccessNotif" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+                <div id="modalSuccessBox" class="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 flex flex-col items-center relative modal-animate-in">
+                    <svg class="w-10 h-10 text-green-500 mb-2 animate-bounceIn" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    <div class="text-green-700 font-semibold text-center mb-2 animate-fadeIn">Berhasil</div>
+                    <div class="text-gray-700 text-center mb-4 animate-fadeIn">{{ session('success') }}</div>
+                    <button onclick="closeModalSuccessNotif()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded transition-all duration-200">Tutup</button>
+                    <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl leading-none" onclick="closeModalSuccessNotif()">&times;</button>
+                </div>
+            </div>
+            <script>
+            // Custom bounceIn for icon
+            document.querySelector('#modalSuccessBox svg').animate([
+                { transform: 'scale(0.7)', opacity: 0 },
+                { transform: 'scale(1.15)', opacity: 1, offset: 0.7 },
+                { transform: 'scale(1)', opacity: 1 }
+            ], {
+                duration: 600,
+                easing: 'cubic-bezier(0.4,0,0.2,1)'
+            });
+            // Fade in for text
+            document.querySelectorAll('#modalSuccessBox .animate-fadeIn').forEach(function(el, i){
+                el.animate([
+                    { opacity: 0, transform: 'translateY(10px)' },
+                    { opacity: 1, transform: 'translateY(0)' }
+                ], {
+                    duration: 400,
+                    delay: 200 + i*100,
+                    fill: 'forwards',
+                    easing: 'cubic-bezier(0.4,0,0.2,1)'
+                });
+            });
+            // Auto close after 3s with fade out
+            setTimeout(function(){
+                const modal = document.getElementById('modalSuccessNotif');
+                const box = document.getElementById('modalSuccessBox');
+                if(modal && box){
+                    box.classList.remove('modal-animate-in');
+                    box.classList.add('modal-animate-out');
+                    setTimeout(function(){ modal.classList.add('hidden'); }, 400);
+                }
+            }, 3000);
+            function closeModalSuccessNotif(){
+                const modal = document.getElementById('modalSuccessNotif');
+                const box = document.getElementById('modalSuccessBox');
+                if(modal && box){
+                    box.classList.remove('modal-animate-in');
+                    box.classList.add('modal-animate-out');
+                    setTimeout(function(){ modal.classList.add('hidden'); }, 400);
+                }
+            }
+            </script>
+        @endif
 
         <script>
         // Modal logic

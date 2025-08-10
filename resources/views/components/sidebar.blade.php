@@ -1,12 +1,10 @@
 @php
-  use App\Models\User;
-
   $profil = Auth::user();
 @endphp
 
 @if ($profil->role == 'Peneliti')
 {{-- Sidebar Peneliti --}}
-<aside id="sidebar" class="w-full md:w-50 bg-gray-200 pt-16 h-auto md:h-screen shadow fixed md:max-h-full md:block hidden">
+<aside id="sidebar" class="w-full md:w-50 bg-gray-200 pt-16 h-auto md:h-screen shadow fixed md:max-h-full md:block hidden z-20">
   <div class="flex flex-col justify-between h-full">
     
     {{-- Bagian atas: profil dan menu --}}
@@ -72,9 +70,9 @@
 
 
 
-@elseif ($profil->role == 'Admin')
+@elseif ($profil->role == 'Administrator')
 {{-- Sidebar Admin --}}
-<aside id="sidebar" class="w-full md:w-50 bg-gray-200 pt-16 h-auto md:h-screen shadow fixed md:max-h-full md:block hidden">
+<aside id="sidebar" class="w-full md:w-50 bg-gray-200 pt-16 h-auto md:h-screen shadow fixed md:max-h-full md:block hidden z-20">
   <div class="flex flex-col justify-between h-full">
 
     {{-- Bagian atas: profil dan menu --}}
@@ -87,12 +85,12 @@
                   $profil = Auth::user();
               @endphp
 
-              <a href="{{route('admin.profil')}}" class="hover:text-blue-950">
+              <a href="{{route('Administrator.profil')}}" class="hover:text-blue-950">
                   <p class="text-lg font-bold">Hai, {{ $profil->name }}</p>
                   <p class="text-sm font-light">masuk profil</p>
               </a>
           </div>
-          <a href="{{route('admin.profil')}}">
+          <a href="{{route('Administrator.profil')}}">
             <img 
               @if (!empty($profil->avatar_path))
                   src="{{ asset("public/" . $profil->avatar_path) }}"
@@ -107,7 +105,7 @@
       {{-- Menu Navigasi --}}
       <ul class="divide-y divide-gray-600 md:pt-2">
         <div class="max-md:divide-y py-1 divide-gray-600">
-          <li><x-Nav-Link href="{{route('admin.dashboard')}}" :active="request()->is('admin/dashboard')">Dasbor Admin</x-Nav-Link></li>
+          <li><x-Nav-Link href="{{route('admin.dashboard')}}" :active="request()->is('admin/dashboard')">Dasbor Administrator</x-Nav-Link></li>
           <li><x-Nav-Link href="{{route('admin.kelolaUser')}}" :active="request()->is('admin/kelolaUser')">Kelola User</x-Nav-Link></li>
         </div>
         <div class="max-md:divide-y py-1 divide-gray-600">
@@ -141,7 +139,7 @@
 
 @elseif ($profil->role == 'Kepk')
 {{-- Sidebar KEPK/Sekretaris --}}
-<aside id="sidebar" class="w-full md:w-50 bg-gray-200 pt-16 h-auto md:h-screen shadow fixed md:max-h-full md:block hidden">
+<aside id="sidebar" class="w-full md:w-50 bg-gray-200 pt-16 h-auto md:h-screen shadow fixed md:max-h-full md:block hidden z-20">
   <div class="flex flex-col justify-between h-full">
 
     {{-- Bagian atas: profil dan menu --}}
@@ -204,7 +202,7 @@
 
 @elseif($profil->role == 'Penguji')
 {{-- Sidebar Penguji --}}
-<aside id="sidebar" class="w-full md:w-50 bg-gray-200 pt-16 h-auto md:h-screen shadow fixed md:max-h-full md:block hidden">
+<aside id="sidebar" class="w-full md:w-50 bg-gray-200 pt-16 h-auto md:h-screen shadow fixed md:max-h-full md:block hidden z-20">
   <div class="flex flex-col justify-between h-full">
 
     {{-- Bagian atas: Profil dan Menu --}}

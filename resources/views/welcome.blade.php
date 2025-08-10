@@ -55,9 +55,21 @@
               <a href="#kontak" class="font-semibold hover:text-blue-500 nav-link transition-all duration-200">Kontak</a>
             </div>
             <div id="signin" class="hidden lg:flex lg:flex-1 lg:justify-end text-gray-900">
-              <a href="signin" class="text-lg font-bold hover:text-blue-500">
-                Daftar Akun <span aria-hidden="true">&rarr;</span>
-            </a>
+            @if(Auth::check())
+                <a href="{{
+                    Auth::user()->role == 'Peneliti' ? url('/peneliti/dashboard') :
+                    (Auth::user()->role == 'Administrator' ? url('/admin/dashboard') :
+                    (Auth::user()->role == 'Kepk' ? url('/kepk/dashboard') :
+                    (Auth::user()->role == 'Penguji' ? url('/penguji/dashboard') : '#')))
+                }}" class="text-lg font-bold hover:text-blue-500">
+                    Dashboard {{Auth::user()->role}}
+                    <span aria-hidden="true">&rarr;</span>
+                </a>
+            @else
+                <a href="signin" class="text-lg font-bold hover:text-blue-500">
+                    Daftar Akun <span aria-hidden="true">&rarr;</span>
+                </a>
+            @endif
             </div>
           </nav>
           <!-- Mobile menu, show/hide based on menu open state. -->
@@ -103,8 +115,17 @@
               <h1 class="text-5xl font-semibold tracking-tight text-balance text-gray-900 sm:text-6xl">Aplikasi layanan komisi etik penelitian kesehatan</h1>
               <p class="mt-8 text-lg font-medium text-pretty text-gray-500 sm:text-xl/8">Fakultas Kesehatan Universitas Nurul Jadid Paiton</p>
               <div class="mt-10 flex items-center justify-center gap-x-6">
-                <a href="signin" class="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">Daftar Sekarang</a>
-                <a href="login" class="text-sm/6 font-semibold text-gray-900 hover:text-blue-900">Masuk Akun <span aria-hidden="true">→</span></a>
+                @if(Auth::check())
+                    <a href="{{
+                        Auth::user()->role == 'Peneliti' ? url('/peneliti/dashboard') :
+                        (Auth::user()->role == 'Administrator' ? url('/admin/dashboard') :
+                        (Auth::user()->role == 'Kepk' ? url('/kepk/dashboard') :
+                        (Auth::user()->role == 'Penguji' ? url('/penguji/dashboard') : '#')))
+                    }}" class="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">Dashboard {{Auth::user()->role}}</a>
+                @else
+                    <a href="signin" class="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">Daftar Sekarang</a>
+                    <a href="login" class="text-sm/6 font-semibold text-gray-900 hover:text-blue-900">Masuk Akun <span aria-hidden="true">→</span></a>
+                @endif
               </div>
             </div>
           </div>
